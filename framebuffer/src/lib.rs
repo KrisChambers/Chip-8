@@ -1,38 +1,46 @@
+extern crate model;
+extern crate data;
+
 mod utils;
+
+use model::FrameBuffer;
 
 /// Framebuffer implementation.
 ///
 /// A Framebuffer contains all the data needed to draw a pixel to the screen.
 /// Each pixel is represented by a bit. The height is assumed to be 64 pixels wide.
 ///
-pub struct FrameBuffer {
+pub struct Chip8FrameBuffer {
     height: usize,
     pixels: Vec<u64>,
 }
 
-impl FrameBuffer {
+impl Chip8FrameBuffer {
     /// Creates a new FrameBuffer.
     ///
-    /// ### Arguments
     ///
-    /// * **height** - The height of the buffer.
+    ///### Arguments
+    ///
+    ///-** height **- : The height of the buffer.
     ///
     pub fn new(height: usize) -> Self {
-        FrameBuffer {
+        Chip8FrameBuffer {
             height,
             pixels: vec![0; height],
         }
     }
+}
 
-    /// Draws a sprite to the buffer. Returns a flag indicating if there was a collision.
+impl FrameBuffer for Chip8FrameBuffer {
+    /// Draws a sprite to this buffer.
     ///
-    /// ### Arguments
+    ///###  Arguments
     ///
-    /// * **x** - The x coordinate to start drawing at.
-    /// * **y** - The y coordinate to start drawing at.
-    /// * **sprite** - The slice containing the sprite to be drawn.
+    ///-** x **-        : The x coordinate for where to start drawing.
+    ///-** y **-        : The y coordinate for where to start drawing.
+    ///-** sprite **-   : A slice containing the sprite data.
     ///
-    pub fn draw(&mut self, x: usize, y: usize, sprite: &[u8]) -> bool {
+    fn draw(&mut self, x: usize, y: usize, sprite: &[data::Byte]) -> bool {
         let y_initial = y;
 
         let mut has_collision = false;
@@ -61,16 +69,16 @@ impl FrameBuffer {
 use std::fmt;
 use std::{ops::Deref, result::Result};
 
-impl fmt::Debug for FrameBuffer {
+impl fmt::Debug for Chip8FrameBuffer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         self.pixels
             .iter()
-            .map(|x| f.write_fmt(format_args!("{:064b}\n", x)))
+            .map(|x| f.write_fmt(format_args!("{:064b}\r\n", x)))
             .fold(Ok(()), |acc, x| acc.and(x))
     }
 }
 
-impl Deref for FrameBuffer {
+impl Deref for Chip8FrameBuffer {
     type Target = [u64];
 
     fn deref(&self) -> &Self::Target {
@@ -83,7 +91,7 @@ mod tests {
     use super::*;
     #[test]
     fn new_should_have_pixels_length_as_height() {
-        let fb = FrameBuffer::new(32);
+        let fb = Chip8FrameBuffer::new(32);
 
         assert_eq!(fb.pixels.len(), 32);
     }
@@ -103,27 +111,44 @@ mod tests {
     #[test]
     fn draw_should_draw_a_simple_sprite() {
         let fb = {
-            let mut fb = FrameBuffer::new(32);
+            let mut fb = Chip8FrameBuffer::new(32);
 
-            let collision = fb.draw(0, 0, &[0b10000001, 0b01000010, 0b00100100, 0b00011000]);
+            let collision = fb.draw(0, 0, &[
+                0b10000001u8.into(),
+                0b01000010.into(),
+                0b00100100.into(),
+                0b00011000.into()
+            ]);
 
             assert!(!collision);
 
             fb
         };
 
-        assert_eq!(fb[31], 0b1000000100000000000000000000000000000000000000000000000000000000);
-        assert_eq!(fb[30], 0b0100001000000000000000000000000000000000000000000000000000000000);
-        assert_eq!(fb[29], 0b0010010000000000000000000000000000000000000000000000000000000000);
-        assert_eq!(fb[28], 0b0001100000000000000000000000000000000000000000000000000000000000);
+        assert_eq!(
+            fb[31],
+            0b1000000100000000000000000000000000000000000000000000000000000000
+        );
+        assert_eq!(
+            fb[30],
+            0b0100001000000000000000000000000000000000000000000000000000000000
+        );
+        assert_eq!(
+            fb[29],
+            0b0010010000000000000000000000000000000000000000000000000000000000
+        );
+        assert_eq!(
+            fb[28],
+            0b0001100000000000000000000000000000000000000000000000000000000000
+        );
     }
 
     #[test]
     fn draw_should_return_true_if_collision() {
-        let mut fb = FrameBuffer::new(32);
+        let mut fb = Chip8FrameBuffer::new(32);
 
-        fb.draw(0, 0, &[0b10000001, 0b01000010, 0b00100100, 0b00011000]);
-        let collision = fb.draw(0, 0, &[0b10000001, 0b01000010, 0b00100100, 0b00011000]);
+        fb.draw(0, 0, &[0b10000001.into(), 0b01000010.into(), 0b00100100.into(), 0b00011000.into()]);
+        let collision = fb.draw(0, 0, &[0b10000001.into(), 0b01000010.into(), 0b00100100.into(), 0b00011000.into()]);
 
         assert!(collision);
     }

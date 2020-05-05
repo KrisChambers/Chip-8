@@ -18,10 +18,9 @@ pub fn compute_index<YInitial: Into<usize>, YCurrent: Into<usize>>(
 /// The line is returned in the right position as a u64 to be
 /// written to the display.
 ///
-pub fn get_sprite_line<X: Into<u32>, Y: Into<usize>>(mem_slice: &[u8], x: X, y: Y) -> u64 {
-    let line = mem_slice[y.into()] as u64;
+pub fn get_sprite_line<X: Into<u32>, Y: Into<usize>>(mem_slice: &[data::Byte], x: X, y: Y) -> u64 {
+    let raw: u8 = mem_slice[y.into()].into();
+    let line = raw as u64;
 
-    let line = line.rotate_right(8).rotate_right(x.into());
-
-    line
+    line.rotate_right(8).rotate_right(x.into())
 }
