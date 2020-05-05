@@ -1,10 +1,10 @@
 extern crate termion;
 
-use termion::event::{ Event, Key };
+use termion::event::{Event, Key};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 
-use std::{io::{ stdout, Write }};
+use std::io::{stdout, Write};
 
 fn main() {
     let mut stdin = termion::async_stdin().events();
@@ -18,26 +18,28 @@ fn main() {
     write!(stdout, "{}", termion::clear::All).unwrap();
 
     loop {
-        write!(stdout, "{}{}{}",
+        write!(
+            stdout,
+            "{}{}{}",
             termion::clear::All,
-            termion::cursor::Goto(1,1),
+            termion::cursor::Goto(1, 1),
             count
-        ).unwrap();
-        
-        write!(stdout, "{}",
-            termion::cursor::Goto(1,2)
-        ).unwrap();
-        
+        )
+        .unwrap();
+
+        write!(stdout, "{}", termion::cursor::Goto(1, 2)).unwrap();
+
         count += 1;
-      
+
         if let Some(Ok(Event::Key(Key::Char(c)))) = stdin.next() {
             match c {
                 'q' => break,
-                _ => { }
+                _ => {}
             };
         }
 
-        let screen = buffer.iter()
+        let screen = buffer
+            .iter()
             .map(|line| format!("{:064b}", line))
             .collect::<Vec<String>>()
             .join("\r\n");
@@ -45,7 +47,7 @@ fn main() {
         write!(stdout, "{}", screen).unwrap();
         stdout.flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(10));
-  }
+    }
 }
 
 #[test]

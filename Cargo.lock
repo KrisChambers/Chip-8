@@ -12,6 +12,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "framebuffer"
+version = "0.1.0"
+
+[[package]]
 name = "libc"
 version = "0.2.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"

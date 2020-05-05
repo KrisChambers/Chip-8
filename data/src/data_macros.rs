@@ -1,5 +1,3 @@
-
-
 #[macro_export]
 macro_rules! format_as_hex {
     ($type_name: ty) => {
@@ -7,7 +5,7 @@ macro_rules! format_as_hex {
         use std::result::Result;
 
         impl fmt::Display for $type_name {
-            fn fmt(&self, f:&mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
                 f.write_fmt(format_args!("{:#X}", self.0))
             }
         }
@@ -17,15 +15,15 @@ macro_rules! format_as_hex {
                 fmt::Display::fmt(&self, f)
             }
         }
-    }
+    };
 }
 
 /// Creates a simple tuple type wrapping a single numeric type.
-/// 
+///
 /// Debug and Display are formatted to display as hexidecimal
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * **name** - The name of the type.
 /// * **wrapped_type** - The type being wrapped.
 /// * **filter** -  A simple function for formatting the value.
@@ -33,10 +31,10 @@ macro_rules! format_as_hex {
 macro_rules! numeric_wrapper {
     ($name: ident, $wrapped_type: ty, $filter: expr) => {
         #[derive(PartialEq, PartialOrd, Copy, Clone, Default)]
-        pub struct $name ($wrapped_type);
+        pub struct $name($wrapped_type);
 
         impl $name {
-            pub fn new (raw: $wrapped_type) -> Self {
+            pub fn new(raw: $wrapped_type) -> Self {
                 $name($filter(raw))
             }
         }
@@ -48,5 +46,5 @@ macro_rules! numeric_wrapper {
         }
 
         format_as_hex!($name);
-    }
+    };
 }

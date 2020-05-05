@@ -1,10 +1,9 @@
 //! Represents a single byte.
-//! 
+//!
 
 numeric_wrapper!(Byte, u8, |x| x & 0x00FF);
 
 impl Byte {
-
     /// Returns the least significant bit.
     ///
     pub fn get_lsb(&self) -> u8 {
@@ -12,18 +11,18 @@ impl Byte {
     }
 
     /// Returns the most significant bit.
-    /// 
+    ///
     pub fn get_msb(&self) -> u8 {
         (self.0 & 0b10000000) >> 7
     }
 
     /// Returns the BCD representation.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// let (h, t, o) = data::Byte::new(123).get_bcd_rep();
-    /// 
+    ///
     /// assert_eq!(h, 1);
     /// assert_eq!(t, 2);
     /// assert_eq!(o, 3);
@@ -63,7 +62,7 @@ mod tests {
     fn get_bcd_rep_of_100_10_and_1() {
         let x = Byte::new(100);
 
-        assert_eq!(x.get_bcd_rep(), (1,0,0));
+        assert_eq!(x.get_bcd_rep(), (1, 0, 0));
 
         let x = Byte::new(10);
 
