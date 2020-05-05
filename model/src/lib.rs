@@ -81,7 +81,7 @@ pub trait Memory {
     fn set(&mut self, address: Address, byte: Byte);
 }
 
-pub trait FrameBuffer: std::ops::Deref<Target = [u64]> {
+pub trait Chip8FrameBuffer: std::ops::Deref<Target = [u64]> {
     /// Draws a sprite to this buffer.
     ///
     ///###  Arguments
@@ -130,3 +130,4 @@ pub trait Chip8ProgramCounter {
     ///
     fn set(&mut self, addr: Address);
 }
+
