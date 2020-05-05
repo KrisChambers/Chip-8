@@ -60,7 +60,7 @@ pub trait RegisterBank {
 
 /// Represents the accessible memory for the virtual machine.
 ///
-pub trait Memory {
+pub trait Chip8Memory {
     /// Gets the byte stored in the register.
     ///
     ///###  Arguments

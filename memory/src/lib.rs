@@ -1,25 +1,25 @@
 extern crate data;
 extern crate model;
 
-use model::Memory;
+use model::Chip8Memory;
 
 use data::{Address, Byte};
 
-pub struct _Chip8Memory {
+pub struct Memory {
     store: [Byte; 4096],
 }
 
-impl _Chip8Memory {
+impl Memory {
     /// Creates a new Chip8Memory.
     ///
     pub fn new() -> Self {
-        _Chip8Memory {
+        Memory {
             store: [0.into(); 4096],
         }
     }
 }
 
-impl Memory for _Chip8Memory {
+impl Chip8Memory for Memory {
     fn get(&self, addr: data::Address) -> data::Byte {
         let addr: u16 = addr.into();
 
@@ -40,14 +40,14 @@ mod tests {
 
     #[test]
     fn new_works() {
-        let mut mem = Chip8Memory::new();
+        let mut mem = Memory::new();
 
         mem.set(0u16.into(), 1.into());
     }
 
     #[test]
     fn get_works() {
-        let mut mem = Chip8Memory::new();
+        let mut mem = Memory::new();
 
         mem.store[0] = 1.into();
 
@@ -56,7 +56,7 @@ mod tests {
 
     #[test]
     fn set_works() {
-        let mut mem = Chip8Memory::new();
+        let mut mem = Memory::new();
 
         mem.set(0.into(), 1.into());
         let byte = mem.get(0.into());
