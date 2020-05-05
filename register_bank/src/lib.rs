@@ -1,25 +1,25 @@
 extern crate data;
 extern crate model;
 
-use model::{Register, RegisterBank};
+use model::{Register, Chip8RegisterBank};
 
 use data::{Address, Byte};
 
-pub struct Chip8RegisterBank {
+pub struct _Chip8RegisterBank {
     store: [Byte; 16],
     i: Address,
 }
 
-impl Chip8RegisterBank {
+impl _Chip8RegisterBank {
     pub fn new() -> Self {
-        Chip8RegisterBank {
+        _Chip8RegisterBank {
             store: [0.into(); 16],
             i: 0.into(),
         }
     }
 }
 
-impl RegisterBank for Chip8RegisterBank {
+impl Chip8RegisterBank for _Chip8RegisterBank {
     fn get_v(&self, r: Register) -> Byte {
         self.store[r as usize]
     }
@@ -41,7 +41,7 @@ mod tests {
 
     #[test]
     fn set_v_works() {
-        let mut rb = Chip8RegisterBank::new();
+        let mut rb = _Chip8RegisterBank::new();
 
         rb.set_v(Register::V0, 1.into());
 

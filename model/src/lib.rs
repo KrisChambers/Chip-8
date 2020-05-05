@@ -3,11 +3,14 @@ mod register;
 
 pub use register::*;
 
-use data::{Address, Byte};
+use data::{
+    Address,
+    Byte
+};
 
 /// Trait describing the main functionality of a VirtualMachine.
 ///
-pub trait VirtualMachine {
+pub trait Chip8VirtualMachine {
     /// Creates a new VirtualMachine.
     ///
     fn new() -> Self;
@@ -27,7 +30,7 @@ pub trait VirtualMachine {
 
 /// Represents a collection of Registers.
 ///
-pub trait RegisterBank {
+pub trait Chip8RegisterBank {
     /// Returns the byte contained in the register.
     ///
     ///###  Arguments

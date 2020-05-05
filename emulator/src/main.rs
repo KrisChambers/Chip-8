@@ -10,14 +10,14 @@ use termion::{
 };
 
 extern crate framebuffer;
-use framebuffer::Chip8FrameBuffer;
+use framebuffer::FrameBuffer;
 
 fn main() {
     let mut stdin = termion::async_stdin().events();
     let stdout = stdout();
     let mut stdout = stdout.lock().into_raw_mode().unwrap();
 
-    let buffer = Chip8FrameBuffer::new(32);
+    let buffer = FrameBuffer::new(32);
 
     let mut count = 0;
 
