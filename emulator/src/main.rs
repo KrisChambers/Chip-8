@@ -4,20 +4,20 @@ use std::io::{stdout, Write};
 
 extern crate termion;
 use termion::{
-    event:: { Event, Key },
+    event::{Event, Key},
     input::TermRead,
-    raw::IntoRawMode
+    raw::IntoRawMode,
 };
 
 extern crate framebuffer;
-use framebuffer::FrameBuffer;
+use framebuffer::Chip8FrameBuffer;
 
 fn main() {
     let mut stdin = termion::async_stdin().events();
     let stdout = stdout();
     let mut stdout = stdout.lock().into_raw_mode().unwrap();
 
-    let buffer = FrameBuffer::new(32);
+    let buffer = Chip8FrameBuffer::new(32);
 
     let mut count = 0;
 
@@ -25,11 +25,13 @@ fn main() {
 
     loop {
         write!(
-            stdout, "{}{}{}",
+            stdout,
+            "{}{}{}",
             termion::clear::All,
             termion::cursor::Goto(1, 1),
             count
-        ).unwrap();
+        )
+        .unwrap();
 
         write!(stdout, "{}", termion::cursor::Goto(1, 2)).unwrap();
 
@@ -42,16 +44,8 @@ fn main() {
             };
         }
 
-        write!(stdout, "{}", buffer_as_string(&buffer)).unwrap();
+        write!(stdout, "{}", format!("{:?}", buffer)).unwrap();
         stdout.flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(10));
     }
 }
-
-fn buffer_as_string(buffer: &FrameBuffer) -> String {
-    buffer
-        .iter()
-        .map(|line| format!("{:064b}", line))
-        .fold(String::with_capacity(64 * 32), |acc, line| format!("{}{}\r\n", acc, line))
-}
-
