@@ -1,13 +1,16 @@
-extern crate termion;
-extern crate framebuffer;
-
-use termion::event::{Event, Key};
-use termion::input::TermRead;
-use termion::raw::IntoRawMode;
-
-use framebuffer::FrameBuffer;
+//! Test-Emulator for the Chip-8.
 
 use std::io::{stdout, Write};
+
+extern crate termion;
+use termion::{
+    event:: { Event, Key },
+    input::TermRead,
+    raw::IntoRawMode
+};
+
+extern crate framebuffer;
+use framebuffer::FrameBuffer;
 
 fn main() {
     let mut stdin = termion::async_stdin().events();
@@ -22,8 +25,7 @@ fn main() {
 
     loop {
         write!(
-            stdout,
-            "{}{}{}",
+            stdout, "{}{}{}",
             termion::clear::All,
             termion::cursor::Goto(1, 1),
             count
