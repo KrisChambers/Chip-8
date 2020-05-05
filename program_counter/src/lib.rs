@@ -1,37 +1,32 @@
 extern crate data;
 extern crate model;
 
-use data::{
-    Address,
-    Byte
-};
+use data::{Address, Byte};
 
-use model::{
-    Chip8ProgramCounter
-};
+use model::Chip8ProgramCounter;
 
 const STACK_SIZE: usize = 16;
 
 /// An implementation of a program counter
-/// 
+///
 /// A ProgramCounter maintains the pointer to the current instruction.
 ///
 pub struct ProgramCounter {
     items: [Address; STACK_SIZE],
-    pointer: usize
+    pointer: usize,
 }
 
 impl ProgramCounter {
     /// Creates a new ProgramCounter.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **initial** : The initial address.
     ///
     pub fn new(initial: Address) -> Self {
         let mut this = ProgramCounter {
             items: [Address::new(0); STACK_SIZE],
-            pointer: 0
+            pointer: 0,
         };
 
         this.items[this.pointer] = initial;
@@ -41,12 +36,12 @@ impl ProgramCounter {
 }
 
 impl Chip8ProgramCounter for ProgramCounter {
-
-    fn current(&self) -> Address { self.items[self.pointer] }
+    fn current(&self) -> Address {
+        self.items[self.pointer]
+    }
 
     fn inc(&mut self) {
         self.items[self.pointer] += 1.into();
-        
     }
 
     fn to_subroutine(&mut self, new_ptr: Address) {
@@ -55,7 +50,6 @@ impl Chip8ProgramCounter for ProgramCounter {
     }
 
     fn rtrn(&mut self) {
-
         if self.pointer == 0 {
             panic!("Popping the CallStack will empty the stack.")
         }

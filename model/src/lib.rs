@@ -93,9 +93,7 @@ pub trait FrameBuffer: std::ops::Deref<Target = [u64]> {
     fn draw(&mut self, x: usize, y: usize, sprite: &[Byte]) -> bool;
 }
 
-
 pub trait Chip8ProgramCounter {
-    
     /// Gets the address of the currently executing instruction.
     ///
     fn current(&self) -> Address;
@@ -107,7 +105,7 @@ pub trait Chip8ProgramCounter {
     /// Sets the program counter to the subroutine.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **addr** : The address of the subroutine.
     ///
     fn to_subroutine(&mut self, addr: Address);
@@ -119,9 +117,9 @@ pub trait Chip8ProgramCounter {
     /// Increments the program counter by the provided amount.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **amt** :  The amount to increase the counter by.
-    /// 
+    ///
     fn inc_by(&mut self, amt: Byte);
 
     /// Returns the depth of the stack.
@@ -130,5 +128,5 @@ pub trait Chip8ProgramCounter {
 
     /// Sets the current executing instruction.
     ///
-    fn set(&mut self, addr: Address);    
+    fn set(&mut self, addr: Address);
 }

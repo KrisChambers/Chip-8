@@ -1,14 +1,9 @@
 extern crate data;
 extern crate model;
 
-use model::{
-    Memory
-};
+use model::Memory;
 
-use data::{
-    Byte,
-    Address
-};
+use data::{Address, Byte};
 
 pub struct _Chip8Memory {
     store: [Byte; 4096],
@@ -18,12 +13,13 @@ impl _Chip8Memory {
     /// Creates a new Chip8Memory.
     ///
     pub fn new() -> Self {
-        _Chip8Memory { store: [0.into(); 4096 ]}
+        _Chip8Memory {
+            store: [0.into(); 4096],
+        }
     }
 }
 
 impl Memory for _Chip8Memory {
-    
     fn get(&self, addr: data::Address) -> data::Byte {
         let addr: u16 = addr.into();
 

@@ -29,6 +29,10 @@ impl Register {
     /// 1 if the register is greater than the provided one
     /// 0 if it is equal, or -1 if it is less than.
     ///
+    ///### Arguments
+    ///
+    ///- **reg** : The register key we want to comapare.
+    ///
     pub fn compare(&self, reg: Register) -> i8 {
         let left = *self as u8;
         let right = reg as u8;
@@ -48,6 +52,7 @@ impl Register {
     ///### Arguments
     ///
     ///- **to** : The last register in the range.
+    ///
     pub fn iter_to(to: Register) -> RegisterIterator {
         RegisterIterator::new(to)
     }
@@ -92,6 +97,10 @@ pub struct RegisterIterator {
 
 impl RegisterIterator {
     /// Creates a new RegisterIterator.
+    ///
+    ///### Arguments
+    ///
+    ///- **last** : The last Register in the iteration.
     ///
     pub fn new(last: Register) -> Self {
         RegisterIterator {
