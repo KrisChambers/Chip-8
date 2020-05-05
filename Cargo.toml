@@ -7,5 +7,6 @@ members = [
     "model",
     "register_bank",
     "memory",
-    "program_counter"
+    "program_counter",
+    "cpu"
 ]
