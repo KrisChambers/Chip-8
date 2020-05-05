@@ -3,5 +3,6 @@
 members = [
     "emulator",
     "data",
-    "framebuffer"
+    "framebuffer",
+    "model"
 ]
