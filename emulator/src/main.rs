@@ -53,7 +53,3 @@ fn buffer_as_string(buffer: &FrameBuffer) -> String {
         .fold(String::with_capacity(64 * 32), |acc, line| format!("{}{}\r\n", acc, line))
 }
 
-#[test]
-fn line_test() {
-    println!("{:06b}", 0);
-}
