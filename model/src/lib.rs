@@ -81,7 +81,6 @@ pub trait Memory {
     fn set(&mut self, address: Address, byte: Byte);
 }
 
-pub trait FrameBuffer: std::ops::Deref<Target = [u64]> {
     /// Draws a sprite to this buffer.
     ///
     ///###  Arguments

@@ -3,19 +3,19 @@ extern crate model;
 
 mod utils;
 
-use model::FrameBuffer;
+use model::Chip8FrameBuffer;
 
 /// Framebuffer implementation.
 ///
 /// A Framebuffer contains all the data needed to draw a pixel to the screen.
 /// Each pixel is represented by a bit. The height is assumed to be 64 pixels wide.
 ///
-pub struct Chip8FrameBuffer {
+pub struct FrameBuffer {
     height: usize,
     pixels: Vec<u64>,
 }
 
-impl Chip8FrameBuffer {
+impl FrameBuffer {
     /// Creates a new FrameBuffer.
     ///
     ///
@@ -24,14 +24,14 @@ impl Chip8FrameBuffer {
     ///-** height **- : The height of the buffer.
     ///
     pub fn new(height: usize) -> Self {
-        Chip8FrameBuffer {
+        FrameBuffer {
             height,
             pixels: vec![0; height],
         }
     }
 }
 
-impl FrameBuffer for Chip8FrameBuffer {
+impl Chip8FrameBuffer for FrameBuffer {
     /// Draws a sprite to this buffer.
     ///
     ///###  Arguments
@@ -69,7 +69,7 @@ impl FrameBuffer for Chip8FrameBuffer {
 use std::fmt;
 use std::{ops::Deref, result::Result};
 
-impl fmt::Debug for Chip8FrameBuffer {
+impl fmt::Debug for FrameBuffer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         self.pixels
             .iter()
@@ -78,7 +78,7 @@ impl fmt::Debug for Chip8FrameBuffer {
     }
 }
 
-impl Deref for Chip8FrameBuffer {
+impl Deref for FrameBuffer {
     type Target = [u64];
 
     fn deref(&self) -> &Self::Target {
@@ -91,7 +91,7 @@ mod tests {
     use super::*;
     #[test]
     fn new_should_have_pixels_length_as_height() {
-        let fb = Chip8FrameBuffer::new(32);
+        let fb = FrameBuffer::new(32);
 
         assert_eq!(fb.pixels.len(), 32);
     }
@@ -111,7 +111,7 @@ mod tests {
     #[test]
     fn draw_should_draw_a_simple_sprite() {
         let fb = {
-            let mut fb = Chip8FrameBuffer::new(32);
+            let mut fb = FrameBuffer::new(32);
 
             let collision = fb.draw(
                 0,
@@ -149,7 +149,7 @@ mod tests {
 
     #[test]
     fn draw_should_return_true_if_collision() {
-        let mut fb = Chip8FrameBuffer::new(32);
+        let mut fb = FrameBuffer::new(32);
 
         fb.draw(
             0,
