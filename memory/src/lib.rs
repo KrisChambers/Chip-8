@@ -10,19 +10,19 @@ use data::{
     Address
 };
 
-pub struct Chip8Memory {
+pub struct _Chip8Memory {
     store: [Byte; 4096],
 }
 
-impl Chip8Memory {
+impl _Chip8Memory {
     /// Creates a new Chip8Memory.
     ///
     pub fn new() -> Self {
-        Chip8Memory { store: [0.into(); 4096 ]}
+        _Chip8Memory { store: [0.into(); 4096 ]}
     }
 }
 
-impl Memory for Chip8Memory {
+impl Memory for _Chip8Memory {
     
     fn get(&self, addr: data::Address) -> data::Byte {
         let addr: u16 = addr.into();
