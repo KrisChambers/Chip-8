@@ -1,8 +1,11 @@
 extern crate termion;
+extern crate framebuffer;
 
 use termion::event::{Event, Key};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
+
+use framebuffer::FrameBuffer;
 
 use std::io::{stdout, Write};
 
@@ -11,7 +14,7 @@ fn main() {
     let stdout = stdout();
     let mut stdout = stdout.lock().into_raw_mode().unwrap();
 
-    let buffer = [0u64; 32];
+    let buffer = FrameBuffer::new(32);
 
     let mut count = 0;
 
@@ -24,8 +27,7 @@ fn main() {
             termion::clear::All,
             termion::cursor::Goto(1, 1),
             count
-        )
-        .unwrap();
+        ).unwrap();
 
         write!(stdout, "{}", termion::cursor::Goto(1, 2)).unwrap();
 
@@ -38,16 +40,17 @@ fn main() {
             };
         }
 
-        let screen = buffer
-            .iter()
-            .map(|line| format!("{:064b}", line))
-            .collect::<Vec<String>>()
-            .join("\r\n");
-
-        write!(stdout, "{}", screen).unwrap();
+        write!(stdout, "{}", buffer_as_string(&buffer)).unwrap();
         stdout.flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(10));
     }
+}
+
+fn buffer_as_string(buffer: &FrameBuffer) -> String {
+    buffer
+        .iter()
+        .map(|line| format!("{:064b}", line))
+        .fold(String::with_capacity(64 * 32), |acc, line| format!("{}{}\r\n", acc, line))
 }
 
 #[test]
