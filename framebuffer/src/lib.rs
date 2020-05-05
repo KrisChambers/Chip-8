@@ -1,5 +1,5 @@
-extern crate model;
 extern crate data;
+extern crate model;
 
 mod utils;
 
@@ -113,12 +113,16 @@ mod tests {
         let fb = {
             let mut fb = Chip8FrameBuffer::new(32);
 
-            let collision = fb.draw(0, 0, &[
-                0b10000001u8.into(),
-                0b01000010.into(),
-                0b00100100.into(),
-                0b00011000.into()
-            ]);
+            let collision = fb.draw(
+                0,
+                0,
+                &[
+                    0b10000001u8.into(),
+                    0b01000010.into(),
+                    0b00100100.into(),
+                    0b00011000.into(),
+                ],
+            );
 
             assert!(!collision);
 
@@ -147,8 +151,26 @@ mod tests {
     fn draw_should_return_true_if_collision() {
         let mut fb = Chip8FrameBuffer::new(32);
 
-        fb.draw(0, 0, &[0b10000001.into(), 0b01000010.into(), 0b00100100.into(), 0b00011000.into()]);
-        let collision = fb.draw(0, 0, &[0b10000001.into(), 0b01000010.into(), 0b00100100.into(), 0b00011000.into()]);
+        fb.draw(
+            0,
+            0,
+            &[
+                0b10000001.into(),
+                0b01000010.into(),
+                0b00100100.into(),
+                0b00011000.into(),
+            ],
+        );
+        let collision = fb.draw(
+            0,
+            0,
+            &[
+                0b10000001.into(),
+                0b01000010.into(),
+                0b00100100.into(),
+                0b00011000.into(),
+            ],
+        );
 
         assert!(collision);
     }

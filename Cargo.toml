@@ -4,5 +4,8 @@ members = [
     "emulator",
     "data",
     "framebuffer",
-    "model"
+    "model",
+    "register_bank",
+    "memory",
+    "program_counter"
 ]

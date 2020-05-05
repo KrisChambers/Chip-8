@@ -1,4 +1,7 @@
 extern crate data;
+mod register;
+
+pub use register::*;
 
 use data::{Address, Byte};
 
@@ -22,13 +25,6 @@ pub trait VirtualMachine {
     fn get_framebuffer(&self) -> &[usize];
 }
 
-/// Possible indexes for the Registers.
-///
-pub enum Register {
-    V0 = 0x0,
-    V1 = 0x1, // Todo: Add the other 15
-}
-
 /// Represents a collection of Registers.
 ///
 pub trait RegisterBank {
@@ -38,7 +34,7 @@ pub trait RegisterBank {
     ///
     ///- **r** : The register.
     ///
-    fn get_v(r: Register) -> Byte;
+    fn get_v(&self, r: Register) -> Byte;
 
     /// Sets the byte for the register.
     ///
@@ -47,31 +43,31 @@ pub trait RegisterBank {
     ///- **r** : The register.
     ///- **b** : The byte to be stored.
     ///
-    fn set_v(r: Register, b: Byte);
+    fn set_v(&mut self, r: Register, b: Byte);
 
     /// Returns the contents of the address register.
     ///
-    fn get_i() -> Address;
+    fn get_i(&self) -> Address;
 
     /// Sets the value of the address register.
     ///
-    fn set_i(a: Address);
+    ///###  Arguments
+    ///
+    ///- **a** : The address to be stored.
+    ///
+    fn set_i(&mut self, a: Address);
 }
 
 /// Represents the accessible memory for the virtual machine.
 ///
 pub trait Memory {
-    /// Creates a new Memory object with a capacity of 4096kb.
-    ///
-    fn new() -> Self;
-
     /// Gets the byte stored in the register.
     ///
     ///###  Arguments
     ///
     ///- **address** : The address to the data.
     ///
-    fn get(address: &Address) -> Byte;
+    fn get(&self, address: Address) -> Byte;
 
     /// Sets the value at an address.
     ///
@@ -82,10 +78,10 @@ pub trait Memory {
     ///- **address**    : The Address of the memory we setting.
     ///- **b**          : The byte.
     ///
-    fn set(address: &Address);
+    fn set(&mut self, address: Address, byte: Byte);
 }
 
-pub trait FrameBuffer {
+pub trait FrameBuffer: std::ops::Deref<Target = [u64]> {
     /// Draws a sprite to this buffer.
     ///
     ///###  Arguments
@@ -95,4 +91,44 @@ pub trait FrameBuffer {
     ///- **sprite** : A slice containing the sprite data.
     ///
     fn draw(&mut self, x: usize, y: usize, sprite: &[Byte]) -> bool;
+}
+
+
+pub trait Chip8ProgramCounter {
+    
+    /// Gets the address of the currently executing instruction.
+    ///
+    fn current(&self) -> Address;
+
+    /// Increments the program counter by 1.
+    ///
+    fn inc(&mut self);
+
+    /// Sets the program counter to the subroutine.
+    ///
+    ///### Arguments
+    /// 
+    ///- **addr** : The address of the subroutine.
+    ///
+    fn to_subroutine(&mut self, addr: Address);
+
+    /// Returns from the current routine.
+    ///
+    fn rtrn(&mut self);
+
+    /// Increments the program counter by the provided amount.
+    ///
+    ///### Arguments
+    /// 
+    ///- **amt** :  The amount to increase the counter by.
+    /// 
+    fn inc_by(&mut self, amt: Byte);
+
+    /// Returns the depth of the stack.
+    ///
+    fn depth(&self) -> usize;
+
+    /// Sets the current executing instruction.
+    ///
+    fn set(&mut self, addr: Address);    
 }

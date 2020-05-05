@@ -37,12 +37,16 @@ macro_rules! numeric_wrapper {
             pub fn new(raw: $wrapped_type) -> Self {
                 $name($filter(raw))
             }
+
+            pub fn get_raw(&self) -> $wrapped_type {
+                self.0
+            }
         }
 
         impl From<$wrapped_type> for $name {
-                fn from(value: $wrapped_type) -> Self {
-                    Self(value)
-                }
+            fn from(value: $wrapped_type) -> Self {
+                Self(value)
+            }
         }
 
         impl From<$name> for $wrapped_type {
