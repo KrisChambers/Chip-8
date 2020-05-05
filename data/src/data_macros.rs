@@ -40,8 +40,14 @@ macro_rules! numeric_wrapper {
         }
 
         impl From<$wrapped_type> for $name {
-            fn from(raw: $wrapped_type) -> Self {
-                $name::new(raw)
+                fn from(value: $wrapped_type) -> Self {
+                    Self(value)
+                }
+        }
+
+        impl From<$name> for $wrapped_type {
+            fn from(value: $name) -> Self {
+                value.0
             }
         }
 

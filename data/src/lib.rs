@@ -1,9 +1,11 @@
 #[macro_use]
 mod data_macros;
 
+mod address;
 mod byte;
 mod nibble;
 
+pub use address::Address;
 pub use byte::Byte;
 pub use nibble::Nibble;
 

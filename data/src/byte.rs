@@ -16,9 +16,9 @@ impl Byte {
         (self.0 & 0b10000000) >> 7
     }
 
-    /// Returns the BCD representation.
+    /// Returns the BCD representation
     ///
-    /// # Example
+    ///### Example
     ///
     /// ```rust
     /// let (h, t, o) = data::Byte::new(123).get_bcd_rep();
