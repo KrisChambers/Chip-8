@@ -25,6 +25,8 @@ use register_bank::_Chip8RegisterBank;
 use program_counter::ProgramCounter;
 use framebuffer::FrameBuffer;
 
+/// Creates a new VirtualMachine.
+///
 fn get_vm () -> VirtualMachine<Memory, ProgramCounter, _Chip8RegisterBank, FrameBuffer> {
     VirtualMachine::new(
         Memory::new(),
@@ -66,8 +68,20 @@ fn main() {
             };
         }
 
-        write!(stdout, "{}", format!("{:?}", vm.get_framebuffer())).unwrap();
+        draw_vm(&mut stdout, vm.get_framebuffer());
+
         stdout.flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(10));
     }
+}
+
+/// Draws the framebuffer to the screen.
+///
+///### Arguments
+/// 
+///- **stdout** : The writer we want to write to.
+///- **buffer** : The FrameBuffer to be written.
+/// 
+fn draw_vm<Writer: Write>(stdout: &mut Writer, buffer: &dyn Chip8FrameBuffer) {
+    write!(stdout, "{}", format!("{:?}", buffer)).unwrap()
 }
