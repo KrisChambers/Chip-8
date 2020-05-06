@@ -25,17 +25,21 @@ use register_bank::_Chip8RegisterBank;
 use program_counter::ProgramCounter;
 use framebuffer::FrameBuffer;
 
+fn get_vm () -> VirtualMachine<Memory, ProgramCounter, _Chip8RegisterBank, FrameBuffer> {
+    VirtualMachine::new(
+        Memory::new(),
+        ProgramCounter::new(0x200u16.into()),
+        _Chip8RegisterBank::new(),
+        FrameBuffer::new(32)
+    )
+}
+
 fn main() {
     let mut stdin = termion::async_stdin().events();
     let stdout = stdout();
     let mut stdout = stdout.lock().into_raw_mode().unwrap();
 
-    let mut memory = Memory::new();
-    let mut pc = ProgramCounter::new(0x200u16.into());
-    let mut registers = _Chip8RegisterBank::new();
-    let mut framebuffer = FrameBuffer::new(32);
-
-    let vm = VirtualMachine::new(&mut memory, &mut pc, &mut registers, &mut framebuffer);
+    let vm = get_vm();
 
     let mut count = 0;
 
@@ -57,7 +61,7 @@ fn main() {
 
         if let Some(Ok(Event::Key(Key::Char(c)))) = stdin.next() {
             match c {
-                'q' => break,
+                '`' => break,
                 _ => {}
             };
         }

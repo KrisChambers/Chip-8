@@ -17,22 +17,38 @@ use rand::Rng;
 
 /// An implementation of the Chip8 virtual machine.
 ///
-pub struct VirtualMachine<'a> {
-    memory: &'a mut dyn Chip8Memory,
-    pc: &'a mut dyn Chip8ProgramCounter,
-    registers: &'a mut dyn Chip8RegisterBank,
-    framebuffer: &'a mut dyn Chip8FrameBuffer
+pub struct VirtualMachine<
+    M   : Chip8Memory,
+    PC  : Chip8ProgramCounter,
+    R   : Chip8RegisterBank,
+    FB  : Chip8FrameBuffer
+> {
+    memory: M,
+    pc: PC,
+    registers: R,
+    framebuffer: FB
 }
 
-impl<'a> VirtualMachine<'a> {
+impl<M, PC, R, FB> VirtualMachine<M, PC, R, FB>
+    where
+        M   : Chip8Memory,
+        PC  : Chip8ProgramCounter,
+        R   : Chip8RegisterBank,
+        FB  : Chip8FrameBuffer
+{
     /// Constructs a new VirtualMachine
     ///
     pub fn new(
-        memory: &'a mut dyn Chip8Memory,
-        pc: &'a mut dyn Chip8ProgramCounter,
-        registers: &'a mut dyn Chip8RegisterBank,
-        framebuffer: &'a mut dyn Chip8FrameBuffer
-    ) -> Self {
+        memory: M,
+        pc: PC,
+        registers: R,
+        framebuffer: FB
+    ) -> Self
+    where M : Chip8Memory,
+          PC: Chip8ProgramCounter,
+          R : Chip8RegisterBank,
+          FB: Chip8FrameBuffer
+    {
         VirtualMachine {
             memory,
             pc,
@@ -98,13 +114,20 @@ impl<'a> VirtualMachine<'a> {
     }
 }
 
-impl Chip8VirtualMachine for VirtualMachine<'_> {
+impl<M, PC, R, FB> Chip8VirtualMachine for VirtualMachine<M, PC, R, FB>
+where
+    M : Chip8Memory,
+    PC: Chip8ProgramCounter,
+    R : Chip8RegisterBank,
+    FB: Chip8FrameBuffer
+
+{
     fn execute(&mut self) {
         self.execute_cycles(1);
     }
 
     fn get_framebuffer(&self) -> &dyn Chip8FrameBuffer {
-        self.framebuffer
+        &self.framebuffer
     }
 
     fn load_rom(&mut self, _rom_data: Vec<u8>) { unimplemented!() }
