@@ -154,3 +154,29 @@ pub trait Chip8ProgramCounter {
     ///
     fn set(&mut self, addr: Address);
 }
+
+pub trait Chip8Keyboard {
+    /// Presses the key.
+    /// 
+    ///### Arguments
+    /// 
+    ///- **nibble** : The nibble representing the key pressed.
+    ///
+    fn press(&mut self, key: Nibble);
+
+    /// Releases the key.
+    ///
+    ///### Arguments
+    /// 
+    ///- **key** : The nibble representing the key pressed.
+    ///
+    fn release(&mut self, key: Nibble);
+
+    /// Returns a boolean indicating if the key is pressed.
+    ///
+    ///### Arguments
+    /// 
+    ///- **key** : The key to check.
+    ///
+    fn is_pressed(&self, key: Nibble) -> bool;
+}
