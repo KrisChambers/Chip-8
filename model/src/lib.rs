@@ -3,7 +3,7 @@ mod register;
 
 pub use register::*;
 
-use data::{Address, Byte};
+use data::{Address, Byte, Nibble};
 
 /// Trait describing the main functionality of a VirtualMachine.
 ///
@@ -15,6 +15,18 @@ pub trait Chip8VirtualMachine {
     ///- **n** : The numbers of cycles to be executed.
     ///
     fn execute_cycles(&mut self, n: usize);
+
+    /// Executes a single cycle.
+    ///
+    fn execute(&mut self);
+
+    /// Loads a rom into memory
+    ///
+    ///### Arguments
+    /// 
+    ///- **data** : The bytes of the rom file.
+    ///
+    fn load_rom(&mut self, data: Vec<u8>);
 
     /// Returns the FrameBuffer.
     ///
@@ -75,6 +87,15 @@ pub trait Chip8Memory {
     ///- **b**          : The byte.
     ///
     fn set(&mut self, address: Address, byte: Byte);
+
+    /// Gets a slice of memory starting.
+    ///
+    ///### Arguments
+    /// 
+    ///- **address**    : The starting address for the slice.
+    ///- **nibble**     : The size of the slice.
+    ///
+    fn get_slice(&self, address: Address, nibble: Nibble) -> &[Byte];
 }
 
 pub trait Chip8FrameBuffer: std::ops::Deref<Target = [u64]> {
@@ -86,7 +107,14 @@ pub trait Chip8FrameBuffer: std::ops::Deref<Target = [u64]> {
     ///- **y**      : The y coordinate for where to start drawing.
     ///- **sprite** : A slice containing the sprite data.
     ///
-    fn draw(&mut self, x: usize, y: usize, sprite: &[Byte]) -> bool;
+    fn draw(&mut self, x: Byte, y: Byte, sprite: &[Byte]) -> bool;
+
+    /// Clears the buffer.
+    ///
+    /// Clears the buffer by setting all pixels back
+    /// to zero.
+    ///
+    fn clear(&mut self);
 }
 
 pub trait Chip8ProgramCounter {

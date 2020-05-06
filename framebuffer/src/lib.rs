@@ -4,6 +4,7 @@ extern crate model;
 mod utils;
 
 use model::Chip8FrameBuffer;
+use data::Byte;
 
 /// Framebuffer implementation.
 ///
@@ -36,19 +37,21 @@ impl Chip8FrameBuffer for FrameBuffer {
     ///
     ///###  Arguments
     ///
-    ///-** x **-        : The x coordinate for where to start drawing.
-    ///-** y **-        : The y coordinate for where to start drawing.
-    ///-** sprite **-   : A slice containing the sprite data.
+    ///- **x**        : The x coordinate for where to start drawing.
+    ///- **y**        : The y coordinate for where to start drawing.
+    ///- **sprite**   : A slice containing the sprite data.
     ///
-    fn draw(&mut self, x: usize, y: usize, sprite: &[data::Byte]) -> bool {
+    fn draw(&mut self, x: Byte, y: Byte, sprite: &[Byte]) -> bool {
         let y_initial = y;
 
         let mut has_collision = false;
 
         for y in 0..sprite.len() as usize {
-            let index = utils::compute_index(y_initial, y, self.height);
 
-            let sprite_line = utils::get_sprite_line(sprite, x as u32, y);
+            let index = utils::compute_index(y_initial.get_raw(), y, self.height);
+
+        
+            let sprite_line = utils::get_sprite_line(sprite, x.get_raw(), y);
 
             self.pixels[index] = {
                 let cur = self.pixels[index];
@@ -63,6 +66,13 @@ impl Chip8FrameBuffer for FrameBuffer {
         }
 
         has_collision
+    }
+
+    /// Clears the frame buffer.
+    ///
+    fn clear(&mut self) {
+        let height = self.height;
+        self.pixels = vec![0; height];
     }
 }
 
@@ -108,20 +118,24 @@ mod tests {
         assert_ne!((a ^ c) & a, a);
     }
 
+    fn get_sprite() -> [Byte; 4] {
+        [
+            0b10000001u8.into(),
+            0b01000010u8.into(),
+            0b00100100u8.into(),
+            0b00011000u8.into(),
+        ]   
+    }
+
     #[test]
     fn draw_should_draw_a_simple_sprite() {
         let fb = {
             let mut fb = FrameBuffer::new(32);
 
             let collision = fb.draw(
-                0,
-                0,
-                &[
-                    0b10000001u8.into(),
-                    0b01000010.into(),
-                    0b00100100.into(),
-                    0b00011000.into(),
-                ],
+                0.into(),
+                0.into(),
+                &get_sprite()[0..],
             );
 
             assert!(!collision);
@@ -150,26 +164,17 @@ mod tests {
     #[test]
     fn draw_should_return_true_if_collision() {
         let mut fb = FrameBuffer::new(32);
+        let sprite = get_sprite();
 
         fb.draw(
-            0,
-            0,
-            &[
-                0b10000001.into(),
-                0b01000010.into(),
-                0b00100100.into(),
-                0b00011000.into(),
-            ],
+            0.into(),
+            0.into(),
+            &sprite[0..],
         );
         let collision = fb.draw(
-            0,
-            0,
-            &[
-                0b10000001.into(),
-                0b01000010.into(),
-                0b00100100.into(),
-                0b00011000.into(),
-            ],
+            0.into(),
+            0.into(),
+            &sprite[0..],
         );
 
         assert!(collision);

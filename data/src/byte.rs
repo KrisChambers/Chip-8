@@ -38,7 +38,28 @@ impl Byte {
 
         (hundreds, tens, ones)
     }
+
+    /// Performs an addition and wraps when overflow occurs.
+    ///
+    ///### Arguments
+    /// 
+    ///- **rhs** : The right hand side of the addition.
+    pub fn wrapping_add(self, rhs: Self) -> Self {
+        self.0.wrapping_add(rhs.0).into()
+    }
+
+    /// Returns the result of a wrapping subtraction.
+    ///
+    ///### Arguments
+    ///
+    ///- **rhs** : The right hand side of the subtraction.
+    ///
+    pub fn wrapping_sub(self, rhs: Self) -> Self {
+        self.0.wrapping_sub(rhs.0).into()
+    }
 }
+
+
 
 #[cfg(test)]
 mod tests {

@@ -67,7 +67,7 @@ impl Chip8ProgramCounter for ProgramCounter {
     }
 
     fn set(&mut self, new_pc: Address) {
-        self.items[self.pointer] = new_pc
+        self.items[self.pointer] = new_pc;
     }
 }
 
