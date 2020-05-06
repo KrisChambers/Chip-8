@@ -11,10 +11,6 @@ use data::{
 /// Trait describing the main functionality of a VirtualMachine.
 ///
 pub trait Chip8VirtualMachine {
-    /// Creates a new VirtualMachine.
-    ///
-    fn new() -> Self;
-
     /// Executes cycles of the machine.
     ///
     ///###  Arguments
@@ -25,7 +21,7 @@ pub trait Chip8VirtualMachine {
 
     /// Returns the FrameBuffer.
     ///
-    fn get_framebuffer(&self) -> &[usize];
+    fn get_framebuffer(&self) -> &[u64];
 }
 
 /// Represents a collection of Registers.
@@ -133,4 +129,3 @@ pub trait Chip8ProgramCounter {
     ///
     fn set(&mut self, addr: Address);
 }
-

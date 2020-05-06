@@ -8,5 +8,6 @@ members = [
     "register_bank",
     "memory",
     "program_counter",
-    "cpu"
+    "cpu",
+    "instruction"
 ]
