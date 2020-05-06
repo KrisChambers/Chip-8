@@ -8,4 +8,9 @@ edition = "2018"
 
 [dependencies]
 termion = "1.5.5"
+model = { path = "../model" }
+cpu = { path = "../cpu" }
+memory = { path = "../memory" }
 framebuffer = { path = "../framebuffer" }
+register_bank = { path = "../register_bank" }
+program_counter = { path = "../program_counter" }

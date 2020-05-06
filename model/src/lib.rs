@@ -30,7 +30,7 @@ pub trait Chip8VirtualMachine {
 
     /// Returns the FrameBuffer.
     ///
-    fn get_framebuffer(&self) -> &[u64];
+    fn get_framebuffer(&self) -> &dyn Chip8FrameBuffer;
 }
 
 /// Represents a collection of Registers.
@@ -98,7 +98,7 @@ pub trait Chip8Memory {
     fn get_slice(&self, address: Address, nibble: Nibble) -> &[Byte];
 }
 
-pub trait Chip8FrameBuffer: std::ops::Deref<Target = [u64]> {
+pub trait Chip8FrameBuffer: std::ops::Deref<Target = [u64]> + std::fmt::Debug {
     /// Draws a sprite to this buffer.
     ///
     ///###  Arguments

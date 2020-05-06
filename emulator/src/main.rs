@@ -9,7 +9,20 @@ use termion::{
     raw::IntoRawMode,
 };
 
+extern crate cpu;
+extern crate memory;
+extern crate register_bank;
+extern crate program_counter;
 extern crate framebuffer;
+extern crate model;
+
+// We want all traits from the model in scope.
+use model::*;
+
+use cpu::VirtualMachine;
+use memory::Memory;
+use register_bank::_Chip8RegisterBank;
+use program_counter::ProgramCounter;
 use framebuffer::FrameBuffer;
 
 fn main() {
@@ -17,7 +30,12 @@ fn main() {
     let stdout = stdout();
     let mut stdout = stdout.lock().into_raw_mode().unwrap();
 
-    let buffer = FrameBuffer::new(32);
+    let mut memory = Memory::new();
+    let mut pc = ProgramCounter::new(0x200u16.into());
+    let mut registers = _Chip8RegisterBank::new();
+    let mut framebuffer = FrameBuffer::new(32);
+
+    let vm = VirtualMachine::new(&mut memory, &mut pc, &mut registers, &mut framebuffer);
 
     let mut count = 0;
 
@@ -44,7 +62,7 @@ fn main() {
             };
         }
 
-        write!(stdout, "{}", format!("{:?}", buffer)).unwrap();
+        write!(stdout, "{}", format!("{:?}", vm.get_framebuffer())).unwrap();
         stdout.flush().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(10));
     }

@@ -24,7 +24,12 @@ version = "0.1.0"
 name = "emulator"
 version = "0.1.0"
 dependencies = [
+ "cpu",
  "framebuffer",
+ "memory",
+ "model",
+ "program_counter",
+ "register_bank",
  "termion",
 ]
 

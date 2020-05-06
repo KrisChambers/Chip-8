@@ -27,7 +27,7 @@ pub struct VirtualMachine<'a> {
 impl<'a> VirtualMachine<'a> {
     /// Constructs a new VirtualMachine
     ///
-    fn new(
+    pub fn new(
         memory: &'a mut dyn Chip8Memory,
         pc: &'a mut dyn Chip8ProgramCounter,
         registers: &'a mut dyn Chip8RegisterBank,
@@ -103,8 +103,8 @@ impl Chip8VirtualMachine for VirtualMachine<'_> {
         self.execute_cycles(1);
     }
 
-    fn get_framebuffer(&self) -> &[u64] {
-        unimplemented!();
+    fn get_framebuffer(&self) -> &dyn Chip8FrameBuffer {
+        self.framebuffer
     }
 
     fn load_rom(&mut self, _rom_data: Vec<u8>) { unimplemented!() }
