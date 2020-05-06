@@ -3,10 +3,7 @@ mod register;
 
 pub use register::*;
 
-use data::{
-    Address,
-    Byte
-};
+use data::{Address, Byte};
 
 /// Trait describing the main functionality of a VirtualMachine.
 ///

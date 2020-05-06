@@ -1,7 +1,7 @@
 extern crate data;
 extern crate model;
 
-use model::{Register, Chip8RegisterBank};
+use model::{Chip8RegisterBank, Register};
 
 use data::{Address, Byte};
 

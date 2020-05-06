@@ -1,13 +1,6 @@
+use data::{Address, Byte, Nibble};
 
-use data::{
-    Address,
-    Byte,
-    Nibble
-};
-
-use model::{
-    Register
-};
+use model::Register;
 
 type ParseResult = (Address, Register, Register, Byte, Nibble);
 
@@ -16,21 +9,22 @@ type ParseResult = (Address, Register, Register, Byte, Nibble);
 ///### Arguments
 ///
 ///- **instr** : The raw instruction.
-/// 
+///
 pub fn parse_raw_instruction(instr: u16) -> ParseResult {
     let (vx, vy) = get_registers(instr);
     (
         get_address(instr),
-        vx, vy,
+        vx,
+        vy,
         get_byte(instr),
-        get_nibble(instr)
+        get_nibble(instr),
     )
 }
 
 /// Gets the nibble from the instruction.
 ///
 ///### Arguments
-/// 
+///
 ///- **inst** : The raw instruction.
 ///
 fn get_nibble(inst: u16) -> Nibble {
@@ -40,7 +34,7 @@ fn get_nibble(inst: u16) -> Nibble {
 /// Gets the address from the instruction.
 ///
 ///### Arguments
-/// 
+///
 ///- **inst** : The raw instruction.
 ///
 fn get_address(inst: u16) -> Address {
@@ -50,9 +44,9 @@ fn get_address(inst: u16) -> Address {
 /// Gets the register keys from an instruction.
 ///
 ///### Arguments
-/// 
+///
 ///- **inst** : The raw instruction.
-/// 
+///
 fn get_registers(inst: u16) -> (Register, Register) {
     let reg_bits = ((inst & 0x00F0) >> 4) as u8;
     let vy = Register::new(reg_bits);
