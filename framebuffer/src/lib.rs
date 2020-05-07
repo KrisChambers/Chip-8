@@ -3,8 +3,8 @@ extern crate model;
 
 mod utils;
 
-use model::Chip8FrameBuffer;
 use data::Byte;
+use model::Chip8FrameBuffer;
 
 /// Framebuffer implementation.
 ///
@@ -47,10 +47,8 @@ impl Chip8FrameBuffer for FrameBuffer {
         let mut has_collision = false;
 
         for y in 0..sprite.len() as usize {
-
             let index = utils::compute_index(y_initial.get_raw(), y, self.height);
 
-        
             let sprite_line = utils::get_sprite_line(sprite, x.get_raw(), y);
 
             self.pixels[index] = {
@@ -124,7 +122,7 @@ mod tests {
             0b01000010u8.into(),
             0b00100100u8.into(),
             0b00011000u8.into(),
-        ]   
+        ]
     }
 
     #[test]
@@ -132,11 +130,7 @@ mod tests {
         let fb = {
             let mut fb = FrameBuffer::new(32);
 
-            let collision = fb.draw(
-                0.into(),
-                0.into(),
-                &get_sprite()[0..],
-            );
+            let collision = fb.draw(0.into(), 0.into(), &get_sprite()[0..]);
 
             assert!(!collision);
 
@@ -166,16 +160,8 @@ mod tests {
         let mut fb = FrameBuffer::new(32);
         let sprite = get_sprite();
 
-        fb.draw(
-            0.into(),
-            0.into(),
-            &sprite[0..],
-        );
-        let collision = fb.draw(
-            0.into(),
-            0.into(),
-            &sprite[0..],
-        );
+        fb.draw(0.into(), 0.into(), &sprite[0..]);
+        let collision = fb.draw(0.into(), 0.into(), &sprite[0..]);
 
         assert!(collision);
     }

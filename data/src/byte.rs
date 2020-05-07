@@ -42,7 +42,7 @@ impl Byte {
     /// Performs an addition and wraps when overflow occurs.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **rhs** : The right hand side of the addition.
     pub fn wrapping_add(self, rhs: Self) -> Self {
         self.0.wrapping_add(rhs.0).into()
@@ -58,8 +58,6 @@ impl Byte {
         self.0.wrapping_sub(rhs.0).into()
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {

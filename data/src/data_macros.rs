@@ -59,15 +59,15 @@ macro_rules! numeric_wrapper {
 
         impl ops::BitOr for $name {
             type Output = Self;
-            
+
             fn bitor(self, rhs: Self) -> Self {
                 (self.0 | rhs.0).into()
-            }   
+            }
         }
 
         impl ops::BitAnd for $name {
             type Output = Self;
-        
+
             fn bitand(self, rhs: Self) -> Self {
                 (self.0 & rhs.0).into()
             }
@@ -75,7 +75,7 @@ macro_rules! numeric_wrapper {
 
         impl ops::BitXor for $name {
             type Output = Self;
-        
+
             fn bitxor(self, rhs: Self) -> Self {
                 (self.0 ^ rhs.0).into()
             }
@@ -83,7 +83,7 @@ macro_rules! numeric_wrapper {
 
         impl<T: Into<$wrapped_type>> ops::Add<T> for $name {
             type Output = Self;
-            
+
             fn add(self, rhs: T) -> Self {
                 Self(self.0 + rhs.into())
             }
@@ -91,7 +91,7 @@ macro_rules! numeric_wrapper {
 
         impl ops::Sub for $name {
             type Output = Self;
-        
+
             fn sub(self, rhs: Self) -> Self {
                 (self.0 - rhs.0).into()
             }
@@ -99,7 +99,7 @@ macro_rules! numeric_wrapper {
 
         impl ops::Shr<usize> for $name {
             type Output = Self;
-            
+
             fn shr(self, rhs: usize) -> Self {
                 (self.0 >> rhs).into()
             }
@@ -107,7 +107,7 @@ macro_rules! numeric_wrapper {
 
         impl ops::Shl<usize> for $name {
             type Output = Self;
-        
+
             fn shl(self, rhs: usize) -> Self {
                 (self.0 << rhs).into()
             }

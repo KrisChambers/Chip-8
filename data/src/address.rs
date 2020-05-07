@@ -5,10 +5,7 @@ use super::byte::Byte;
 
 numeric_wrapper!(Address, u16, |x| x & 0x0FFF);
 
-use std::ops::{
-    AddAssign,
-    Add
-};
+use std::ops::{Add, AddAssign};
 
 impl AddAssign for Address {
     fn add_assign(&mut self, rhs: Self) {
@@ -20,7 +17,7 @@ impl Add<Byte> for Address {
     type Output = Self;
     fn add(self, rhs: Byte) -> Self {
         let rhs: u16 = rhs.get_raw().into();
-        
+
         Self(self.0 + rhs)
     }
 }

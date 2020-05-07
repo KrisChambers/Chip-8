@@ -3,7 +3,7 @@ extern crate model;
 
 use model::Chip8Memory;
 
-use data::{ Address, Byte, Nibble };
+use data::{Address, Byte, Nibble};
 
 pub struct Memory {
     store: [Byte; 4096],
@@ -21,15 +21,13 @@ impl Memory {
 
 impl Chip8Memory for Memory {
     fn get(&self, addr: Address) -> Byte {
-        let addr = addr
-            .get_raw() as usize;
+        let addr = addr.get_raw() as usize;
 
         self.store[addr]
     }
 
     fn set(&mut self, addr: Address, byte: Byte) {
-        let addr = addr
-            .get_raw() as usize;
+        let addr = addr.get_raw() as usize;
 
         self.store[addr] = byte;
     }
@@ -39,7 +37,7 @@ impl Chip8Memory for Memory {
         let length: usize = length.get_raw().into();
         let end = start + length;
 
-        &self.store[start .. end]
+        &self.store[start..end]
     }
 }
 

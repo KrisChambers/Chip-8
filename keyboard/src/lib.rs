@@ -1,18 +1,16 @@
-extern crate model;
 extern crate data;
+extern crate model;
 
-use model::Chip8Keyboard;
 use data::Nibble;
+use model::Chip8Keyboard;
 
 pub struct Keyboard {
-    keys: u16
+    keys: u16,
 }
 
 impl Keyboard {
     pub fn new() -> Self {
-        Keyboard {
-            keys: 0
-        }
+        Keyboard { keys: 0 }
     }
 }
 
@@ -28,12 +26,16 @@ impl Chip8Keyboard for Keyboard {
     fn is_pressed(&self, key: Nibble) -> bool {
         self.keys & get_key_code(key) > 0
     }
+
+    fn clear(&mut self) {
+        self.keys = 0;
+    }
 }
 
 /// Creates the key code for a key.
 ///
 fn get_key_code(key: Nibble) -> u16 {
-    2u16.pow( key.get_raw() as u32 )
+    2u16.pow(key.get_raw() as u32)
 }
 
 #[cfg(test)]

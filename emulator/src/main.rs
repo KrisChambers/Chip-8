@@ -10,32 +10,32 @@ use termion::{
 };
 
 extern crate cpu;
-extern crate memory;
-extern crate register_bank;
-extern crate program_counter;
 extern crate framebuffer;
-extern crate model;
 extern crate keyboard;
+extern crate memory;
+extern crate model;
+extern crate program_counter;
+extern crate register_bank;
 
 // We want all traits from the model in scope.
 use model::*;
 
 use cpu::VirtualMachine;
-use memory::Memory;
-use register_bank::RegisterBank;
-use program_counter::ProgramCounter;
 use framebuffer::FrameBuffer;
 use keyboard::Keyboard;
+use memory::Memory;
+use program_counter::ProgramCounter;
+use register_bank::RegisterBank;
 
 /// Creates a new VirtualMachine.
 ///
-fn get_vm () -> VirtualMachine<Memory, ProgramCounter, RegisterBank, FrameBuffer, Keyboard> {
+fn get_vm() -> VirtualMachine<Memory, ProgramCounter, RegisterBank, FrameBuffer, Keyboard> {
     VirtualMachine::new(
         Memory::new(),
         ProgramCounter::new(0x200u16.into()),
         RegisterBank::new(),
         FrameBuffer::new(32),
-        Keyboard::new()
+        Keyboard::new(),
     )
 }
 
@@ -81,10 +81,10 @@ fn main() {
 /// Draws the framebuffer to the screen.
 ///
 ///### Arguments
-/// 
+///
 ///- **stdout** : The writer we want to write to.
 ///- **buffer** : The FrameBuffer to be written.
-/// 
+///
 fn draw_vm<Writer: Write>(stdout: &mut Writer, buffer: &dyn Chip8FrameBuffer) {
     write!(stdout, "{}", format!("{:?}", buffer)).unwrap()
 }

@@ -23,7 +23,7 @@ pub trait Chip8VirtualMachine {
     /// Loads a rom into memory
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **data** : The bytes of the rom file.
     ///
     fn load_rom(&mut self, data: Vec<u8>);
@@ -91,7 +91,7 @@ pub trait Chip8Memory {
     /// Gets a slice of memory starting.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **address**    : The starting address for the slice.
     ///- **nibble**     : The size of the slice.
     ///
@@ -157,9 +157,9 @@ pub trait Chip8ProgramCounter {
 
 pub trait Chip8Keyboard {
     /// Presses the key.
-    /// 
+    ///
     ///### Arguments
-    /// 
+    ///
     ///- **nibble** : The nibble representing the key pressed.
     ///
     fn press(&mut self, key: Nibble);
@@ -167,7 +167,7 @@ pub trait Chip8Keyboard {
     /// Releases the key.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **key** : The nibble representing the key pressed.
     ///
     fn release(&mut self, key: Nibble);
@@ -175,8 +175,12 @@ pub trait Chip8Keyboard {
     /// Returns a boolean indicating if the key is pressed.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **key** : The key to check.
     ///
     fn is_pressed(&self, key: Nibble) -> bool;
+
+    /// Resets the keyboard so nothing is pressed.
+    ///
+    fn clear(&mut self);
 }
