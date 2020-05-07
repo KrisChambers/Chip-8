@@ -26,6 +26,7 @@ version = "0.1.0"
 dependencies = [
  "cpu",
  "framebuffer",
+ "keyboard",
  "memory",
  "model",
  "program_counter",

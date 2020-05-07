@@ -15,24 +15,27 @@ extern crate register_bank;
 extern crate program_counter;
 extern crate framebuffer;
 extern crate model;
+extern crate keyboard;
 
 // We want all traits from the model in scope.
 use model::*;
 
 use cpu::VirtualMachine;
 use memory::Memory;
-use register_bank::_Chip8RegisterBank;
+use register_bank::RegisterBank;
 use program_counter::ProgramCounter;
 use framebuffer::FrameBuffer;
+use keyboard::Keyboard;
 
 /// Creates a new VirtualMachine.
 ///
-fn get_vm () -> VirtualMachine<Memory, ProgramCounter, _Chip8RegisterBank, FrameBuffer> {
+fn get_vm () -> VirtualMachine<Memory, ProgramCounter, RegisterBank, FrameBuffer, Keyboard> {
     VirtualMachine::new(
         Memory::new(),
         ProgramCounter::new(0x200u16.into()),
-        _Chip8RegisterBank::new(),
-        FrameBuffer::new(32)
+        RegisterBank::new(),
+        FrameBuffer::new(32),
+        Keyboard::new()
     )
 }
 

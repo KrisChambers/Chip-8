@@ -14,3 +14,4 @@ memory = { path = "../memory" }
 framebuffer = { path = "../framebuffer" }
 register_bank = { path = "../register_bank" }
 program_counter = { path = "../program_counter" }
+keyboard = { path = "../keyboard" }

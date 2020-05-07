@@ -9,10 +9,14 @@ use model::{
     Chip8ProgramCounter,
     Chip8RegisterBank,
     Chip8FrameBuffer,
+    Chip8Keyboard,
     Register
 };
 use instruction::Instruction;
-use data::Byte;
+use data::{
+    Byte,
+    Nibble
+};
 use rand::Rng;
 
 /// An implementation of the Chip8 virtual machine.
@@ -21,20 +25,25 @@ pub struct VirtualMachine<
     M   : Chip8Memory,
     PC  : Chip8ProgramCounter,
     R   : Chip8RegisterBank,
-    FB  : Chip8FrameBuffer
+    FB  : Chip8FrameBuffer,
+    KB  : Chip8Keyboard
 > {
     memory: M,
     pc: PC,
     registers: R,
-    framebuffer: FB
+    framebuffer: FB,
+    keyboard: KB,
+    delay_timer: u8,
+    sound_timer: u8
 }
 
-impl<M, PC, R, FB> VirtualMachine<M, PC, R, FB>
+impl<M, PC, R, FB, KB> VirtualMachine<M, PC, R, FB, KB>
     where
         M   : Chip8Memory,
         PC  : Chip8ProgramCounter,
         R   : Chip8RegisterBank,
-        FB  : Chip8FrameBuffer
+        FB  : Chip8FrameBuffer,
+        KB  : Chip8Keyboard
 {
     /// Constructs a new VirtualMachine
     ///
@@ -42,18 +51,19 @@ impl<M, PC, R, FB> VirtualMachine<M, PC, R, FB>
         memory: M,
         pc: PC,
         registers: R,
-        framebuffer: FB
+        framebuffer: FB,
+        keyboard: KB
     ) -> Self
-    where M : Chip8Memory,
-          PC: Chip8ProgramCounter,
-          R : Chip8RegisterBank,
-          FB: Chip8FrameBuffer
+
     {
         VirtualMachine {
             memory,
             pc,
             registers,
-            framebuffer
+            framebuffer,
+            keyboard,
+            delay_timer: 0,
+            sound_timer: 0
         }
     }
 
@@ -114,12 +124,13 @@ impl<M, PC, R, FB> VirtualMachine<M, PC, R, FB>
     }
 }
 
-impl<M, PC, R, FB> Chip8VirtualMachine for VirtualMachine<M, PC, R, FB>
+impl<M, PC, R, FB, KB> Chip8VirtualMachine for VirtualMachine<M, PC, R, FB, KB>
 where
-    M : Chip8Memory,
-    PC: Chip8ProgramCounter,
-    R : Chip8RegisterBank,
-    FB: Chip8FrameBuffer
+    M   : Chip8Memory,
+    PC  : Chip8ProgramCounter,
+    R   : Chip8RegisterBank,
+    FB  : Chip8FrameBuffer,
+    KB  : Chip8Keyboard
 
 {
     fn execute(&mut self) {
@@ -288,28 +299,50 @@ where
                     self.framebuffer.draw(x, y, mem_slice);
                 },
                 SkipPressed(vx) => {
-                    unimplemented!()
+                    let key = self.registers.get_v(vx);
+                    let n = Nibble::new(key.get_raw());
+
+                    if self.keyboard.is_pressed(n) {
+                        self.inc_pc();
+                        self.inc_pc();
+                        pcupdated = true;
+                    };
                 },
                 SkipNotPressed(vx) => {
-                    unimplemented!()
+                    let key = self.registers.get_v(vx);
+                    let n: Nibble = key.get_raw().into();
+
+                    if !self.keyboard.is_pressed(n) {
+                        self.inc_pc();
+                        self.inc_pc();
+                        pcupdated = true;
+                    }
                 },
                 LoadDelayTimer(vx) => {
-                    unimplemented!()
+                    self.registers.set_v(vx, self.delay_timer.into());
                 },
                 WaitForKey(vx) => {
+                    // TODO: Need to think about this one a bit.    
                     unimplemented!()
                 },
                 SetDelayTimer(vx) => {
-                    unimplemented!()
+                    self.delay_timer = self.registers.get_v(vx).get_raw();
                 },
                 SetSoundTimer(vx) => {
-                    unimplemented!()
+                    self.sound_timer = self.registers.get_v(vx).get_raw();
                 },
                 
                 IncrementAddress(vx) => {
-                    unimplemented!()
+                    let i = self.registers.get_i();
+                    let b = self.registers.get_v(vx);
+
+                    self.registers.set_i(i + b);
                 },
                 LoadSpriteAddress(vx) => {
+                    // Todo: I think this is more accurately
+                    // refering to the fonts that where loaded.
+                    // vx contains a digit 0x0-0xF
+                    // And I is set to the start of that font.
                     unimplemented!()
                 },
                 LoadBCD(vx) => {
