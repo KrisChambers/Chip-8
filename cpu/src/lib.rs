@@ -373,7 +373,52 @@ where
                 }
 
                 WaitForKey(vx) => {
-                    // TODO: Need to think about this one a bit.
+                    /* TODO:
+                       An Idea. When this instruction is hit. We need to set a flag in the vm.
+                       One of the variants would be WaitingForKey(Option<Nibble>).
+
+                       In the execute_cycle function we then have the following bit of code.
+
+                           if let WaitingForKey(Some(n)) = self.state {
+                               if self.keyboard.is_pressed(n) {
+                                   .. continue with execution
+                               } else {
+                                   .. continue waiting.
+                                   return
+                               }
+                           }
+
+                       Things to note:
+
+                           1. After hitting the instruction the program counter will be set to the
+                           next instruction that will be executed when the key is hit.
+
+                           2. If multiple cycles are being executed at once, we only need to check if the
+                           key is pressed once.
+
+                           3. We need to move the actual instruction interpretation into a different
+                           function.
+
+                        Todo:
+                           Implement:
+                                pub enum VMState {
+                                    Initializing,
+                                    LoadingROM,
+                                    LoadingFont,
+                                    Executing
+                                    Paused,
+                                    WaitingForKey(Option<Nibble>),
+                                }
+
+                            Move the cycle execution into a function in impl VirtualMachine.
+                                So execute_cycle should look something like:
+                                    1. waiting?
+                                    2. update state to execute
+                                    3. run function that handles the execution
+
+
+
+                    */
                     unimplemented!()
                 }
 
@@ -394,9 +439,18 @@ where
 
                 LoadSpriteAddress(vx) => {
                     // We are loading the fonts starting at index 0 in the memory.
+                    // (See the new function above.)
                     // Each font is 8 bits wide (1 byte) and 5 bits high.
                     // So 0 is at 0, 1 is at 5, 2 at 10. ie. digit * 5
-                    unimplemented!();
+
+                    // Firstly we only support 16 possible digits.
+                    // So we pass it through Nibble to make sure it is in this range.
+                    let byte = self.registers.get_v(vx);
+                    let digit: u16 = Nibble::new(byte.into()).get_raw().into();
+
+                    let address = Address::new(digit * 5);
+
+                    self.registers.set_i(address)
                 }
 
                 LoadBCD(vx) => {
