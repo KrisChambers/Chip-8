@@ -5,6 +5,7 @@ extern crate rand;
 
 mod vm_state;
 
+use vm_state::VMState;
 use data::{Address, Byte, Nibble};
 use instruction::Instruction;
 use model::{
@@ -48,6 +49,7 @@ pub struct VirtualMachine<
     registers: R,
     framebuffer: FB,
     keyboard: KB,
+    state: VMState,
     delay_timer: u8,
     sound_timer: u8,
 }
@@ -69,6 +71,7 @@ where
             registers,
             framebuffer,
             keyboard,
+            state: VMState::Initializing,   // TODO: What should be the initial state?
             delay_timer: 0,
             sound_timer: 0,
         };
@@ -139,46 +142,26 @@ where
     fn inc_pc(&mut self) {
         self.pc.inc_by(2.into());
     }
-}
 
-impl<M, PC, R, FB, KB> Chip8VirtualMachine for VirtualMachine<M, PC, R, FB, KB>
-where
-    M: Chip8Memory,
-    PC: Chip8ProgramCounter,
-    R: Chip8RegisterBank,
-    FB: Chip8FrameBuffer,
-    KB: Chip8Keyboard,
-{
-    fn get_framebuffer(&self) -> &dyn Chip8FrameBuffer {
-        &self.framebuffer
-    }
-
-    fn load_rom(&mut self, data: Vec<u8>) {
-        let start_addr = self.pc.current();
-
-        for i in 0..data.len() {
-            let addr = start_addr + (i as u16);
-            let data: Byte = data[i].into();
-
-            self.memory.set(addr, data);
+    /// Returns a flag indicating if the vm is waiting for a key press.
+    ///
+    fn is_waiting(&self) -> bool {
+        if let VMState::WaitingForKey(Some(n)) = self.state {
+            !self.keyboard.is_pressed(n)
+        } else {
+            false
         }
     }
 
-    fn press_key(&mut self, key: Nibble) {
-        self.keyboard.press(key);
+    /// Returns a flag indicating if the vm is paused.
+    ///
+    fn is_paused(&self) -> bool {
+        self.state == VMState::Paused
     }
 
-    fn execute(&mut self) {
-        self.execute_cycles(1);
-    }
-
-    fn execute_cycles(&mut self, cycles: usize) {
-        use Instruction::*;
-
-        let mut pcupdated = false;
-
-        for _cycle in 0..cycles {
-            let instruction = self.get_instr();
+    fn interpret_instruction(&mut self, instruction: Instruction) -> bool {
+            use Instruction::*;
+        //let instruction = self.get_instr();
 
             match instruction {
                 Sys(_addr) => {
@@ -200,13 +183,13 @@ where
                     // the program counter is updated later.
                     // Kinda hacky solution for now.
                     self.pc.set(addr);
-                    pcupdated = true;
+                    return true;
                 }
 
                 Call(addr) => {
                     // See Jump comment.
                     self.pc.to_subroutine(addr);
-                    pcupdated = true;
+                    return true;
                 }
 
                 SkipEqualByte(vx, byte) => {
@@ -214,7 +197,7 @@ where
 
                     if contents == byte {
                         self.inc_pc();
-                        pcupdated = true;
+                        return true;
                     }
                 }
 
@@ -223,7 +206,7 @@ where
 
                     if contents != byte {
                         self.inc_pc();
-                        pcupdated = true;
+                        return true;
                     }
                 }
 
@@ -232,7 +215,7 @@ where
 
                     if x == y {
                         self.inc_pc();
-                        pcupdated = true;
+                        return true;
                     }
                 }
 
@@ -241,7 +224,7 @@ where
 
                     if x != y {
                         self.inc_pc();
-                        pcupdated = true;
+                        return true;
                     }
                 }
 
@@ -360,7 +343,7 @@ where
                     if self.keyboard.is_pressed(n) {
                         self.inc_pc();
                         self.inc_pc();
-                        pcupdated = true;
+                        return true;
                     };
                 }
 
@@ -371,7 +354,7 @@ where
                     if !self.keyboard.is_pressed(n) {
                         self.inc_pc();
                         self.inc_pc();
-                        pcupdated = true;
+                        return true;
                     }
                 }
 
@@ -380,6 +363,11 @@ where
                 }
 
                 WaitForKey(vx) => {
+                    let digit = self.registers.get_v(vx).get_raw();
+                    let nib = Nibble::from(digit);
+
+                    self.state = VMState::WaitingForKey(Some(nib));
+
                     /* TODO:
                        An Idea. When this instruction is hit. We need to set a flag in the vm.
                        One of the variants would be WaitingForKey(Option<Nibble>).
@@ -426,7 +414,6 @@ where
 
 
                     */
-                    unimplemented!()
                 }
 
                 SetDelayTimer(vx) => {
@@ -493,8 +480,57 @@ where
                 }
             };
 
-            if !pcupdated {
-                self.pc.inc_by(2.into())
+            false
+    }
+}
+
+impl<M, PC, R, FB, KB> Chip8VirtualMachine for VirtualMachine<M, PC, R, FB, KB>
+where
+    M: Chip8Memory,
+    PC: Chip8ProgramCounter,
+    R: Chip8RegisterBank,
+    FB: Chip8FrameBuffer,
+    KB: Chip8Keyboard,
+{
+    fn get_framebuffer(&self) -> &dyn Chip8FrameBuffer {
+        &self.framebuffer
+    }
+
+    fn load_rom(&mut self, data: Vec<u8>) {
+        self.state = VMState::LoadingROM;
+
+        let start_addr = self.pc.current();
+
+        for i in 0..data.len() {
+            let addr = start_addr + (i as u16);
+            let data: Byte = data[i].into();
+
+            self.memory.set(addr, data);
+        }
+
+        self.state = VMState::Initializing;
+    }
+
+    fn press_key(&mut self, key: Nibble) {
+        self.keyboard.press(key);
+    }
+
+    fn execute(&mut self) {
+        self.execute_cycles(1);
+    }
+
+    fn execute_cycles(&mut self, cycles: usize) {
+        for _ in 0..cycles {
+            if self.is_waiting() || self.is_paused() {
+                return;
+            }
+
+            let instruction = self.get_instr();
+
+            self.state = VMState::Executing(instruction);
+
+            if !self.interpret_instruction(instruction) {
+                self.pc.inc_by(2.into());
             }
         }
     }
