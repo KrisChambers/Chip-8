@@ -30,7 +30,7 @@ type RawInstruction = u16;
 
 /// An instruction to be executed by the vm.
 ///
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Instruction {
     // Represents an invalid instruction
     Invalid(RawInstruction),
