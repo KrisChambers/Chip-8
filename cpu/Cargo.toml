@@ -11,3 +11,4 @@ rand = "*"
 data = { path = "../data" }
 model = { path = "../model" }
 instruction = { path = "../instruction" }
+rom_library = { path = "../rom_library" }

@@ -10,5 +10,6 @@ members = [
     "program_counter",
     "cpu",
     "instruction",
-    "keyboard"
+    "keyboard",
+    "rom_library"
 ]
