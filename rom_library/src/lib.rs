@@ -7,7 +7,7 @@ use std::io;
 /// 
 ///- **name** : The name of the rom.
 ///
-pub fn load_file(name: String) -> Result<Vec<u8>, io::Error> {
+pub fn load_rom(name: String) -> Result<Vec<u8>, io::Error> {
     fs::read(format!("{}.ch8", name))
 }
 
@@ -17,7 +17,7 @@ mod tests {
 
     #[test]
     fn gets_the_file() {
-        let res = load_file("test_opcode".into());
+        let res = load_rom("test_opcode".into());
 
         assert!(res.is_ok());
     }
