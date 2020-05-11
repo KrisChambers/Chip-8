@@ -159,9 +159,15 @@ where
         self.state == VMState::Paused
     }
 
+    /// Performs the instruction. Returns a flag indicating if the program counter
+    /// was updated.
+    ///
+    ///### Arguments
+    ///
+    ///- **instruction** : The Instruction being executed.
+    /// 
     fn interpret_instruction(&mut self, instruction: Instruction) -> bool {
             use Instruction::*;
-        //let instruction = self.get_instr();
 
             match instruction {
                 Sys(_addr) => {
