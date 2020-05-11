@@ -367,53 +367,6 @@ where
                     let nib = Nibble::from(digit);
 
                     self.state = VMState::WaitingForKey(Some(nib));
-
-                    /* TODO:
-                       An Idea. When this instruction is hit. We need to set a flag in the vm.
-                       One of the variants would be WaitingForKey(Option<Nibble>).
-
-                       In the execute_cycle function we then have the following bit of code.
-
-                           if let WaitingForKey(Some(n)) = self.state {
-                               if self.keyboard.is_pressed(n) {
-                                   .. continue with execution
-                               } else {
-                                   .. continue waiting.
-                                   return
-                               }
-                           }
-
-                       Things to note:
-
-                           1. After hitting the instruction the program counter will be set to the
-                           next instruction that will be executed when the key is hit.
-
-                           2. If multiple cycles are being executed at once, we only need to check if the
-                           key is pressed once.
-
-                           3. We need to move the actual instruction interpretation into a different
-                           function.
-
-                        Todo:
-                           Implement:
-                                pub enum VMState {
-                                    Initializing,
-                                    LoadingROM,
-                                    LoadingFont,
-                                    Executing
-                                    Paused,
-                                    WaitingForKey(Option<Nibble>),
-                                }
-
-                            Move the cycle execution into a function in impl VirtualMachine.
-                                So execute_cycle should look something like:
-                                    1. waiting?
-                                    2. update state to execute
-                                    3. run function that handles the execution
-
-
-
-                    */
                 }
 
                 SetDelayTimer(vx) => {
