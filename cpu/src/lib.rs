@@ -3,6 +3,8 @@ extern crate instruction;
 extern crate model;
 extern crate rand;
 
+mod vm_state;
+
 use data::{Address, Byte, Nibble};
 use instruction::Instruction;
 use model::{
@@ -117,6 +119,7 @@ where
     /// Returns the contents of the register
     ///
     ///### Arguments
+    ///
     ///- **r** : The register.
     ///
     fn get_reg(&self, r: Register) -> Byte {
@@ -159,6 +162,10 @@ where
 
             self.memory.set(addr, data);
         }
+    }
+
+    fn press_key(&mut self, key: Nibble) {
+        self.keyboard.press(key);
     }
 
     fn execute(&mut self) {

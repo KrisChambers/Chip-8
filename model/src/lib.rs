@@ -31,6 +31,14 @@ pub trait Chip8VirtualMachine {
     /// Returns the FrameBuffer.
     ///
     fn get_framebuffer(&self) -> &dyn Chip8FrameBuffer;
+
+    /// Set the key to pressed.
+    ///
+    ///### Arguments
+    /// 
+    ///- **key** : A nibble representing the key being pressed.
+    ///
+    fn press_key(&mut self, key: Nibble);
 }
 
 /// Represents a collection of Registers.
