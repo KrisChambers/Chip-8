@@ -45,11 +45,11 @@ pub struct VirtualMachine<
     KB: Chip8Keyboard,
 > {
     memory: M,
-    pc: PC,
+    pub pc: PC,
     registers: R,
     framebuffer: FB,
     keyboard: KB,
-    state: VMState,
+    pub state: VMState,
     delay_timer: u8,
     sound_timer: u8,
 }
@@ -91,7 +91,7 @@ where
     fn get_instr(&self) -> Instruction {
         let pc_addr = self.pc.current();
         let left: u8 = self.memory.get(pc_addr).into();
-        let right: u8 = self.memory.get(pc_addr).into();
+        let right: u8 = self.memory.get(pc_addr + (1 as u16)).into();
 
         Instruction::new((left as u16) << 8 | (right as u16))
     }
@@ -174,7 +174,7 @@ where
                     // This is purposely left unimplemented.
                 }
 
-                Invalid(instr) => panic!("{} is not a valid instruction", instr),
+                Invalid(instr) => println!("{:#X} is not a valid instruction", instr),
 
                 Cls => {
                     self.framebuffer.clear();
@@ -185,9 +185,6 @@ where
                 }
 
                 Jump(addr) => {
-                    // We are decrementing by 2 to take into consideration that
-                    // the program counter is updated later.
-                    // Kinda hacky solution for now.
                     self.pc.set(addr);
                     return true;
                 }
@@ -489,7 +486,7 @@ where
             self.state = VMState::Executing(instruction);
 
             if !self.interpret_instruction(instruction) {
-                self.pc.inc_by(2.into());
+                self.inc_pc();
             }
         }
     }

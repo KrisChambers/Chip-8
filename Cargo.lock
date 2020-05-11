@@ -14,7 +14,6 @@ dependencies = [
  "instruction",
  "model",
  "rand",
- "rom_library",
 ]
 
 [[package]]
@@ -32,6 +31,7 @@ dependencies = [
  "model",
  "program_counter",
  "register_bank",
+ "rom_library",
  "termion",
 ]
 

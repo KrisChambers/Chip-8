@@ -1,5 +1,6 @@
 use std::fs;
 use std::io;
+//use std::env;
 
 /// Load the rom with the given name
 /// 
@@ -8,7 +9,8 @@ use std::io;
 ///- **name** : The name of the rom.
 ///
 pub fn load_rom(name: String) -> Result<Vec<u8>, io::Error> {
-    fs::read(format!("{}.ch8", name))
+    let file = format!("rom_library/{}.ch8", name);
+    fs::read(file)
 }
 
 #[cfg(test)]

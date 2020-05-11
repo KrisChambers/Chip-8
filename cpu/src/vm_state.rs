@@ -3,7 +3,7 @@ use instruction::Instruction;
 
 /// Possible Virtual Machine States.
 ///
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum VMState {
     Initializing,
     LoadingROM,
