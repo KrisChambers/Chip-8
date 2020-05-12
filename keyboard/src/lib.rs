@@ -16,7 +16,7 @@ impl Keyboard {
 
 impl Chip8Keyboard for Keyboard {
     fn press(&mut self, key: Nibble) {
-        self.keys |= get_key_code(key);
+        self.keys = get_key_code(key);
     }
 
     fn release(&mut self, key: Nibble) {
@@ -24,7 +24,7 @@ impl Chip8Keyboard for Keyboard {
     }
 
     fn is_pressed(&self, key: Nibble) -> bool {
-        self.keys & get_key_code(key) > 0
+        self.keys == get_key_code(key)
     }
 
     fn clear(&mut self) {

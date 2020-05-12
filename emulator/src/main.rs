@@ -45,38 +45,51 @@ fn get_vm() -> VM {
 }
 
 fn main() {
-    let mut events = termion::async_stdin().events();
+    let stdin = termion::async_stdin();
     let stdout = stdout();
     let mut stdout = stdout.lock().into_raw_mode().unwrap();
 
     let mut vm = get_vm();
 
-    let rom = load_rom("test_opcode".into()).unwrap();
+    let rom = load_rom("INVADERS".into()).unwrap();
 
     vm.load_rom(rom);
 
-    write!(stdout, "{}", termion::clear::All).unwrap();
+    write!(stdout, "{}{}", termion::clear::All, termion::cursor::Hide).unwrap();
 
+    let mut events = stdin.events();
+    let mut should_exit = false;
+    let mut frame_count: u8 = 10;
     loop {
-        clear(&mut stdout);
+        loop {
+            if let Some(Ok(Event::Key(Key::Char(c)))) = events.next() {
+                if c == '`' { clear(&mut stdout); should_exit = true; }
 
-        write!(stdout, "{}", termion::cursor::Goto(1, 2)).unwrap();
-
-        if let Some(Ok(Event::Key(Key::Char(c)))) = events.next() {
-            if c == '`' { clear(&mut stdout); break; }
-
-            if let Some(key) = get_chip8_key(c) {
-                vm.press_key(key.into());
+                if let Some(key) = get_chip8_key(c) {
+                    vm.press_key(key.into());
+                }
+            } else {
+                break;
             }
         }
 
+        if should_exit { break; }
+
         vm.execute();
 
-        draw_vm(&mut stdout, vm.get_framebuffer());
-        log_state(&mut stdout, &vm);
+        if frame_count == 0 {
+            clear(&mut stdout);
+            write!(stdout, "{}", termion::cursor::Goto(1, 2)).unwrap();
+            draw_vm(&mut stdout, vm.get_framebuffer());
+            log_state(&mut stdout, &vm);
+            stdout.flush().unwrap();
 
-        stdout.flush().unwrap();
-        std::thread::sleep(std::time::Duration::from_millis(100));
+            frame_count = 5;
+        } else {
+            frame_count -= 1;
+        }
+
+        std::thread::sleep(std::time::Duration::from_millis(5));
     }
 }
 

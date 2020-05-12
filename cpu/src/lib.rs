@@ -200,6 +200,7 @@ where
 
                     if contents == byte {
                         self.inc_pc();
+                        self.inc_pc();
                         return true;
                     }
                 }
@@ -208,6 +209,7 @@ where
                     let contents = self.get_reg(vx);
 
                     if contents != byte {
+                        self.inc_pc();
                         self.inc_pc();
                         return true;
                     }
@@ -218,6 +220,7 @@ where
 
                     if x == y {
                         self.inc_pc();
+                        self.inc_pc();
                         return true;
                     }
                 }
@@ -226,6 +229,7 @@ where
                     let (x, y) = self.get_regs(vx, vy);
 
                     if x != y {
+                        self.inc_pc();
                         self.inc_pc();
                         return true;
                     }
@@ -336,7 +340,12 @@ where
                     let i = self.registers.get_i();
                     let mem_slice = self.memory.get_slice(i, nibble);
 
-                    self.framebuffer.draw(x, y, mem_slice);
+                    // Check if there was a collision
+                    if self.framebuffer.draw(x, y, mem_slice) {
+                        self.set_carry(1);
+                    } else {
+                        self.set_carry(0);
+                    }
                 }
 
                 SkipPressed(vx) => {
@@ -423,6 +432,8 @@ where
 
                         self.memory.set(addr, value);
                     }
+
+                    self.registers.set_i(i + (vx as u16) + (1 as u16));
                 }
 
                 CopyToRegisters(vx) => {
@@ -433,6 +444,8 @@ where
 
                         self.registers.set_v(reg, value);
                     }
+
+                    self.registers.set_i(i + (vx as u16) + (1 as u16));
                 }
             };
 
@@ -489,5 +502,9 @@ where
                 self.inc_pc();
             }
         }
+    }
+
+    fn release_keys(&mut self) {
+        self.keyboard.clear();
     }
 }
