@@ -4,6 +4,7 @@ extern crate model;
 use data::Nibble;
 use model::Chip8Keyboard;
 
+#[derive(Debug)]
 pub struct Keyboard {
     pressed: Option<Nibble>,
 }
