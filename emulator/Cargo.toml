@@ -7,7 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-termion = "1.5.5"
 model = { path = "../model" }
 cpu = { path = "../cpu" }
 memory = { path = "../memory" }
@@ -16,3 +15,4 @@ register_bank = { path = "../register_bank" }
 program_counter = { path = "../program_counter" }
 keyboard = { path = "../keyboard" }
 rom_library = { path = "../rom_library" }
+sdl2 = "0.34.0"
