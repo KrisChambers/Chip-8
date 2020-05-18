@@ -48,7 +48,7 @@ pub struct VirtualMachine<
     pub pc: PC,
     registers: R,
     framebuffer: FB,
-    keyboard: KB,
+    pub keyboard: KB,
     pub state: VMState,
     delay_timer: u8,
     sound_timer: u8,
