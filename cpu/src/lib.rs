@@ -44,14 +44,14 @@ pub struct VirtualMachine<
     FB: Chip8FrameBuffer,
     KB: Chip8Keyboard,
 > {
-    memory: M,
+    pub memory: M,
     pub pc: PC,
-    registers: R,
-    framebuffer: FB,
+    pub registers: R,
+    pub framebuffer: FB,
     pub keyboard: KB,
     pub state: VMState,
-    delay_timer: u8,
-    sound_timer: u8,
+    pub delay_timer: u8,
+    pub sound_timer: u8,
 }
 
 impl<M, PC, R, FB, KB> VirtualMachine<M, PC, R, FB, KB>
@@ -157,6 +157,14 @@ where
     ///
     fn is_paused(&self) -> bool {
         self.state == VMState::Paused
+    }
+
+    /// Decrements delay and sound timers.
+    ///
+    fn decrement_timers(&mut self) {
+        if self.delay_timer > 0 { self.delay_timer -= 1; }
+
+        if self.sound_timer > 0 { self.sound_timer -= 1; }
     }
 
     /// Performs the instruction. Returns a flag indicating if the program counter
@@ -490,6 +498,9 @@ where
 
     fn execute_cycles(&mut self, cycles: usize) {
         for _ in 0..cycles {
+
+            self.decrement_timers();
+
             if self.is_waiting() || self.is_paused() {
                 return;
             }
