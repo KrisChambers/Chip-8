@@ -51,7 +51,7 @@ fn main() {
 
     let mut vm = get_vm();
 
-    let rom = load_rom("INVADERS".into()).unwrap();
+    let rom = load_rom("keypad_test".into()).unwrap();
 
     vm.load_rom(rom);
 
