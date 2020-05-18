@@ -104,8 +104,8 @@ fn clear(stdout: &mut RawTerminal<StdoutLock>) {
 
 fn log_state(stdout: &mut RawTerminal<StdoutLock>, vm: &VM) {
     write!(stdout,
-        "{}{:?} : {:?}",
-        termion::cursor::Goto(1,1), vm.state, vm.pc.current()
+        "{}{:?} : {:?} : {:?}",
+        termion::cursor::Goto(1,1), vm.state, vm.pc.current(), vm.keyboard
     ).unwrap();
 }
 
