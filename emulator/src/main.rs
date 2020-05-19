@@ -4,7 +4,7 @@ use sdl2::render::WindowCanvas;
 
 extern crate sdl2;
 use sdl2::{
-    pixels::Color,
+    pixels::{PixelFormat, Color},
     event::Event,
     keyboard::Keycode,
     rect::Rect,
@@ -45,10 +45,14 @@ fn get_vm() -> VM {
 }
 
 fn main() {
+    let cpu_hz: usize = 480;
+    let frames_per_second: usize = 60;
+    let cycles_per_frame = cpu_hz / frames_per_second;
+
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("chip8", 640, 320)
+    let window = video_subsystem.window("chip - 8", 640, 320)
         .position_centered()
         .build()
         .unwrap();
@@ -61,92 +65,107 @@ fn main() {
     canvas.present();   // Kind of like flushing the buffer?
 
     let mut event_pump = sdl_context.event_pump().unwrap();
-    let mut i = 0;
     let mut vm = get_vm();
-    let rom = load_rom("breakout".into()).unwrap();
+    let rom = load_rom("tetris".into()).unwrap();
     vm.load_rom(rom);
 
     'running: loop {
+        let mut cycles = cycles_per_frame;
+
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                Event::KeyDown { keycode: Some(Keycode::Escape), ..} => {
                     break 'running
                 },
-                Event::KeyDown { keycode: Some(Keycode::Num1), ..} => {
-                    vm.press_key(0x1.into());
+                Event::KeyDown { keycode: Some(keycode), ..} => {
+                    process_keycode(keycode, &mut vm);
                 },
-                Event::KeyDown { keycode: Some(Keycode::Num2), ..} => {
-                    vm.press_key(0x2.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::Num3), ..} => {
-                    vm.press_key(0x3.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::Num4), ..} => {
-                    vm.press_key(0xC.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::Q), ..} => {
-                    vm.press_key(0x4.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::W), ..} => {
-                    vm.press_key(0x5.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::E), ..} => {
-                    vm.press_key(0x6.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::R), ..} => {
-                    vm.press_key(0xD.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::A), ..} => {
-                    vm.press_key(0x7.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::S), ..} => {
-                    vm.press_key(0x8.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::D), ..} => {
-                    vm.press_key(0x9.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::F), ..} => {
-                    vm.press_key(0xE.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::Z), ..} => {
-                    vm.press_key(0xA.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::X), ..} => {
-                    vm.press_key(0x0.into());
-                },
-                Event::KeyDown { keycode: Some(Keycode::C), ..} => {
-                    vm.press_key(0xB.into());
+                Event::KeyUp {..} => {
+                    vm.keyboard.clear();
                 }
-                Event::KeyDown { keycode: Some(Keycode::V), ..} => {
-                    vm.press_key(0xF.into());
-                },
                 _ => { }
             }
-        } // Put into another function.
 
-        vm.execute();
+            if cycles > 0 {
+                vm.execute();
+                cycles -= 1;
+            }
+        }
 
+        //println!("{}", vm.delay_timer);
 
+        if cycles > 0 { vm.execute_cycles(cycles)}
+        // vm.execute_cycles(cycles_per_frame);
 
+        // This can happen on the main thread.
         draw_vm(&mut canvas, vm.get_framebuffer());
-        //canvas.set_draw_color(Color::RGB(10, 180, 10));
-        canvas.fill_rect(Rect::new(0, 0, 10, 10)).unwrap();
 
-        std::thread::sleep(std::time::Duration::new(0, 250_000_000u32 / 60));
+        std::thread::sleep(std::time::Duration::new(0, 1_000_000_000u32 / (frames_per_second as u32)));
     }
-
-/*
-fn log_state(stdout: &mut RawTerminal<StdoutLock>, vm: &VM, cycle_time: u128) {
-    write!(stdout,
-        "{}{}{:?}{:?} : {:?} : {:?} : {:?}",
-        termion::cursor::Goto(1,1),
-        termion::clear::CurrentLine,
-        cycle_time,
-        vm.state, vm.pc.current(), vm.keyboard, vm.delay_timer
-    ).unwrap();
 }
-*/
+
+fn process_keycode(keycode: Keycode, vm: &mut VM) {
+    match keycode {
+        Keycode::Num1 => {
+            vm.press_key(0x1.into());
+        },
+        Keycode::Num2 => {
+            vm.press_key(0x2.into());
+        },
+        Keycode::Num3 => {
+            vm.press_key(0x3.into());
+        },
+        Keycode::Num4 => {
+            vm.press_key(0xC.into());
+        },
+        Keycode::Q => {
+            vm.press_key(0x4.into());
+        },
+        Keycode::W => {
+            vm.press_key(0x5.into());
+        },
+        Keycode::E => {
+            vm.press_key(0x6.into());
+        },
+        Keycode::R => {
+            vm.press_key(0xD.into());
+        },
+        Keycode::A => {
+            vm.press_key(0x7.into());
+        },
+        Keycode::S => {
+            vm.press_key(0x8.into());
+        },
+        Keycode::D => {
+            vm.press_key(0x9.into());
+        },
+        Keycode::F => {
+            vm.press_key(0xE.into());
+        },
+        Keycode::Z => {
+            vm.press_key(0xA.into());
+        },
+        Keycode::X => {
+            vm.press_key(0x0.into());
+        },
+        Keycode::C => {
+            vm.press_key(0xB.into());
+        }
+        Keycode::V => {
+            vm.press_key(0xF.into());
+        },
+        _ => { }
+    }
+}
+
+/// Background color for the emulator.
+///
+static BACKGROUND_COLOR: Color = Color::RGB(0, 15, 15);
+
+/// Foreground Color.
+///
+static FOREGROUND_COLOR: Color = Color::RGB(128, 0, 128);
 
 /// Draws the framebuffer to a canvas.
 ///
@@ -158,11 +177,11 @@ fn log_state(stdout: &mut RawTerminal<StdoutLock>, vm: &VM, cycle_time: u128) {
 fn draw_vm(canvas: &mut WindowCanvas, buffer: &dyn Chip8FrameBuffer) {
 
     // This handles drawing the background.
-    canvas.set_draw_color(Color::RGB(0, 15, 15));
+    canvas.set_draw_color(BACKGROUND_COLOR);
     canvas.clear();
 
     // Set the pixel color.
-    canvas.set_draw_color(Color::RGB(0, 200, 0));
+    canvas.set_draw_color(FOREGROUND_COLOR);
 
     let pixels: &[u64] = buffer;
     let len = pixels.len();
