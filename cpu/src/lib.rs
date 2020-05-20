@@ -5,7 +5,6 @@ extern crate rand;
 
 mod vm_state;
 
-use vm_state::VMState;
 use data::{Address, Byte, Nibble};
 use instruction::Instruction;
 use model::{
@@ -13,6 +12,7 @@ use model::{
     Chip8VirtualMachine, Register,
 };
 use rand::Rng;
+use vm_state::VMState;
 
 /// System fonts in byte form.
 ///
@@ -71,7 +71,7 @@ where
             registers,
             framebuffer,
             keyboard,
-            state: VMState::Initializing,   // TODO: What should be the initial state?
+            state: VMState::Initializing, // TODO: What should be the initial state?
             delay_timer: 0,
             sound_timer: 0,
         };
@@ -162,9 +162,13 @@ where
     /// Decrements delay and sound timers.
     ///
     fn decrement_timers(&mut self) {
-        if self.delay_timer > 0 { self.delay_timer -= 1; }
+        if self.delay_timer > 0 {
+            self.delay_timer -= 1;
+        }
 
-        if self.sound_timer > 0 { self.sound_timer -= 1; }
+        if self.sound_timer > 0 {
+            self.sound_timer -= 1;
+        }
     }
 
     /// Performs the instruction. Returns a flag indicating if the program counter
@@ -173,291 +177,291 @@ where
     ///### Arguments
     ///
     ///- **instruction** : The Instruction being executed.
-    /// 
+    ///
     fn interpret_instruction(&mut self, instruction: Instruction) -> bool {
-            use Instruction::*;
+        use Instruction::*;
 
-            match instruction {
-                Sys(_addr) => {
-                    // This is purposely left unimplemented.
-                }
+        match instruction {
+            Sys(_addr) => {
+                // This is purposely left unimplemented.
+            }
 
-                Invalid(instr) => println!("{:#X} is not a valid instruction", instr),
+            Invalid(instr) => println!("{:#X} is not a valid instruction", instr),
 
-                Cls => {
-                    self.framebuffer.clear();
-                }
+            Cls => {
+                self.framebuffer.clear();
+            }
 
-                Return => {
-                    self.pc.rtrn();
-                }
+            Return => {
+                self.pc.rtrn();
+            }
 
-                Jump(addr) => {
-                    self.pc.set(addr);
+            Jump(addr) => {
+                self.pc.set(addr);
+                return true;
+            }
+
+            Call(addr) => {
+                // See Jump comment.
+                self.pc.to_subroutine(addr);
+                return true;
+            }
+
+            SkipEqualByte(vx, byte) => {
+                let contents = self.get_reg(vx);
+
+                if contents == byte {
+                    self.inc_pc();
+                    self.inc_pc();
                     return true;
                 }
+            }
 
-                Call(addr) => {
-                    // See Jump comment.
-                    self.pc.to_subroutine(addr);
+            SkipNotEqualByte(vx, byte) => {
+                let contents = self.get_reg(vx);
+
+                if contents != byte {
+                    self.inc_pc();
+                    self.inc_pc();
                     return true;
                 }
+            }
 
-                SkipEqualByte(vx, byte) => {
-                    let contents = self.get_reg(vx);
+            SkipEqualReg(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
 
-                    if contents == byte {
-                        self.inc_pc();
-                        self.inc_pc();
-                        return true;
-                    }
+                if x == y {
+                    self.inc_pc();
+                    self.inc_pc();
+                    return true;
+                }
+            }
+
+            SkipNotEqualReg(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                if x != y {
+                    self.inc_pc();
+                    self.inc_pc();
+                    return true;
+                }
+            }
+
+            Load(vx, byte) => {
+                self.set_reg(vx, byte);
+            }
+
+            LoadFromReg(vx, vy) => self.set_reg(vx, self.get_reg(vy)),
+
+            Or(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                self.set_reg(vx, x | y)
+            }
+
+            And(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                self.set_reg(vx, x & y);
+            }
+
+            XOr(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                self.set_reg(vx, x ^ y);
+            }
+
+            AddReg(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                self.set_reg(vx, x.wrapping_add(y));
+            }
+
+            SubReg(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                if x > y {
+                    self.set_carry(1);
                 }
 
-                SkipNotEqualByte(vx, byte) => {
-                    let contents = self.get_reg(vx);
+                self.set_reg(vx, x.wrapping_sub(y));
+            }
 
-                    if contents != byte {
-                        self.inc_pc();
-                        self.inc_pc();
-                        return true;
-                    }
+            ShiftRight(vx) => {
+                let x = self.get_reg(vx);
+
+                self.set_carry(x.get_lsb());
+
+                self.set_reg(vx, x >> 1);
+            }
+
+            ReverseSub(vx, vy) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                if y > x {
+                    self.set_carry(1);
+                } else {
+                    self.set_carry(0);
                 }
 
-                SkipEqualReg(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
+                self.set_reg(vx, y - x);
+            }
 
-                    if x == y {
-                        self.inc_pc();
-                        self.inc_pc();
-                        return true;
-                    }
+            ShiftLeft(vx) => {
+                let x = self.get_reg(vx);
+
+                self.set_carry(x.get_msb());
+
+                self.set_reg(vx, x << 1);
+            }
+
+            LoadInstr(addr) => {
+                self.registers.set_i(addr);
+            }
+
+            Add(vx, byte) => {
+                let contents = self.get_reg(vx);
+                self.set_reg(vx, contents.wrapping_add(byte));
+            }
+
+            JumpPlus(addr) => {
+                let summand = self.get_reg(Register::V0);
+                let addr = addr + (summand.get_raw() as u16);
+
+                // NOTE: Need to double check the spec here.
+                // Not sure if we are jumping based on the current pc
+                // or what. Doesn't look to be the case though.
+                self.pc.set(addr);
+            }
+
+            Rand(vx, byte) => {
+                let mut rng = rand::thread_rng();
+
+                let n: Byte = {
+                    let b: u8 = rng.gen();
+
+                    b.into()
+                };
+
+                self.set_reg(vx, n & byte);
+            }
+
+            Draw(vx, vy, nibble) => {
+                let (x, y) = self.get_regs(vx, vy);
+
+                let i = self.registers.get_i();
+                let mem_slice = self.memory.get_slice(i, nibble);
+
+                // Check if there was a collision
+                if self.framebuffer.draw(x, y, mem_slice) {
+                    self.set_carry(1);
+                } else {
+                    self.set_carry(0);
+                }
+            }
+
+            SkipPressed(vx) => {
+                let key = self.registers.get_v(vx);
+                let n = Nibble::new(key.get_raw());
+
+                if self.keyboard.is_pressed(n) {
+                    self.inc_pc();
+                    self.inc_pc();
+                    return true;
+                };
+            }
+
+            SkipNotPressed(vx) => {
+                let key = self.registers.get_v(vx);
+                let n: Nibble = key.get_raw().into();
+
+                if !self.keyboard.is_pressed(n) {
+                    self.inc_pc();
+                    self.inc_pc();
+                    return true;
+                }
+            }
+
+            LoadDelayTimer(vx) => {
+                self.registers.set_v(vx, self.delay_timer.into());
+            }
+
+            WaitForKey(vx) => {
+                let digit = self.registers.get_v(vx).get_raw();
+                let nib = Nibble::from(digit);
+
+                self.state = VMState::WaitingForKey(Some(nib));
+            }
+
+            SetDelayTimer(vx) => {
+                self.delay_timer = self.registers.get_v(vx).get_raw();
+            }
+
+            SetSoundTimer(vx) => {
+                self.sound_timer = self.registers.get_v(vx).get_raw();
+            }
+
+            IncrementAddress(vx) => {
+                let i = self.registers.get_i();
+                let b = self.registers.get_v(vx);
+
+                self.registers.set_i(i + b);
+            }
+
+            LoadSpriteAddress(vx) => {
+                // We are loading the fonts starting at index 0 in the memory.
+                // (See the new function above.)
+                // Each font is 8 bits wide (1 byte) and 5 bits high.
+                // So 0 is at 0, 1 is at 5, 2 at 10. ie. digit * 5
+
+                // Firstly we only support 16 possible digits.
+                // So we pass it through Nibble to make sure it is in this range.
+                let byte = self.registers.get_v(vx);
+                let digit: u16 = Nibble::new(byte.into()).get_raw().into();
+
+                let address = Address::new(digit * 5);
+
+                self.registers.set_i(address)
+            }
+
+            LoadBCD(vx) => {
+                let x = self.registers.get_v(vx);
+                let i = self.registers.get_i();
+                let (h, t, o) = x.get_bcd_rep();
+
+                self.memory.set(i, h.into());
+                self.memory.set(i + 1u16, t.into());
+                self.memory.set(i + 2u16, o.into());
+            }
+
+            CopyToRam(vx) => {
+                // copy from V0 to Vx to memory starting at I.
+                let i = self.registers.get_i();
+
+                for reg in Register::iter_to(vx) {
+                    let value = self.registers.get_v(reg);
+                    let addr = i + (reg as u16);
+
+                    self.memory.set(addr, value);
                 }
 
-                SkipNotEqualReg(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
+                self.registers.set_i(i + (vx as u16) + (1 as u16));
+            }
 
-                    if x != y {
-                        self.inc_pc();
-                        self.inc_pc();
-                        return true;
-                    }
+            CopyToRegisters(vx) => {
+                let i = self.registers.get_i();
+
+                for reg in Register::iter_to(vx) {
+                    let value = self.memory.get(i + (reg as u16));
+
+                    self.registers.set_v(reg, value);
                 }
 
-                Load(vx, byte) => {
-                    self.set_reg(vx, byte);
-                }
+                self.registers.set_i(i + (vx as u16) + (1 as u16));
+            }
+        };
 
-                LoadFromReg(vx, vy) => self.set_reg(vx, self.get_reg(vy)),
-
-                Or(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
-
-                    self.set_reg(vx, x | y)
-                }
-
-                And(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
-
-                    self.set_reg(vx, x & y);
-                }
-
-                XOr(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
-
-                    self.set_reg(vx, x ^ y);
-                }
-
-                AddReg(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
-
-                    self.set_reg(vx, x.wrapping_add(y));
-                }
-
-                SubReg(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
-
-                    if x > y {
-                        self.set_carry(1);
-                    }
-
-                    self.set_reg(vx, x.wrapping_sub(y));
-                }
-
-                ShiftRight(vx) => {
-                    let x = self.get_reg(vx);
-
-                    self.set_carry(x.get_lsb());
-
-                    self.set_reg(vx, x >> 1);
-                }
-
-                ReverseSub(vx, vy) => {
-                    let (x, y) = self.get_regs(vx, vy);
-
-                    if y > x {
-                        self.set_carry(1);
-                    } else {
-                        self.set_carry(0);
-                    }
-
-                    self.set_reg(vx, y - x);
-                }
-
-                ShiftLeft(vx) => {
-                    let x = self.get_reg(vx);
-
-                    self.set_carry(x.get_msb());
-
-                    self.set_reg(vx, x << 1);
-                }
-
-                LoadInstr(addr) => {
-                    self.registers.set_i(addr);
-                }
-
-                Add(vx, byte) => {
-                    let contents = self.get_reg(vx);
-                    self.set_reg(vx, contents.wrapping_add(byte));
-                }
-
-                JumpPlus(addr) => {
-                    let summand = self.get_reg(Register::V0);
-                    let addr = addr + (summand.get_raw() as u16);
-
-                    // NOTE: Need to double check the spec here.
-                    // Not sure if we are jumping based on the current pc
-                    // or what. Doesn't look to be the case though.
-                    self.pc.set(addr);
-                }
-
-                Rand(vx, byte) => {
-                    let mut rng = rand::thread_rng();
-
-                    let n: Byte = {
-                        let b: u8 = rng.gen();
-
-                        b.into()
-                    };
-
-                    self.set_reg(vx, n & byte);
-                }
-
-                Draw(vx, vy, nibble) => {
-                    let (x, y) = self.get_regs(vx, vy);
-
-                    let i = self.registers.get_i();
-                    let mem_slice = self.memory.get_slice(i, nibble);
-
-                    // Check if there was a collision
-                    if self.framebuffer.draw(x, y, mem_slice) {
-                        self.set_carry(1);
-                    } else {
-                        self.set_carry(0);
-                    }
-                }
-
-                SkipPressed(vx) => {
-                    let key = self.registers.get_v(vx);
-                    let n = Nibble::new(key.get_raw());
-
-                    if self.keyboard.is_pressed(n) {
-                        self.inc_pc();
-                        self.inc_pc();
-                        return true;
-                    };
-                }
-
-                SkipNotPressed(vx) => {
-                    let key = self.registers.get_v(vx);
-                    let n: Nibble = key.get_raw().into();
-
-                    if !self.keyboard.is_pressed(n) {
-                        self.inc_pc();
-                        self.inc_pc();
-                        return true;
-                    }
-                }
-
-                LoadDelayTimer(vx) => {
-                    self.registers.set_v(vx, self.delay_timer.into());
-                }
-
-                WaitForKey(vx) => {
-                    let digit = self.registers.get_v(vx).get_raw();
-                    let nib = Nibble::from(digit);
-
-                    self.state = VMState::WaitingForKey(Some(nib));
-                }
-
-                SetDelayTimer(vx) => {
-                    self.delay_timer = self.registers.get_v(vx).get_raw();
-                }
-
-                SetSoundTimer(vx) => {
-                    self.sound_timer = self.registers.get_v(vx).get_raw();
-                }
-
-                IncrementAddress(vx) => {
-                    let i = self.registers.get_i();
-                    let b = self.registers.get_v(vx);
-
-                    self.registers.set_i(i + b);
-                }
-
-                LoadSpriteAddress(vx) => {
-                    // We are loading the fonts starting at index 0 in the memory.
-                    // (See the new function above.)
-                    // Each font is 8 bits wide (1 byte) and 5 bits high.
-                    // So 0 is at 0, 1 is at 5, 2 at 10. ie. digit * 5
-
-                    // Firstly we only support 16 possible digits.
-                    // So we pass it through Nibble to make sure it is in this range.
-                    let byte = self.registers.get_v(vx);
-                    let digit: u16 = Nibble::new(byte.into()).get_raw().into();
-
-                    let address = Address::new(digit * 5);
-
-                    self.registers.set_i(address)
-                }
-
-                LoadBCD(vx) => {
-                    let x = self.registers.get_v(vx);
-                    let i = self.registers.get_i();
-                    let (h, t, o) = x.get_bcd_rep();
-
-                    self.memory.set(i, h.into());
-                    self.memory.set(i + 1u16, t.into());
-                    self.memory.set(i + 2u16, o.into());
-                }
-
-                CopyToRam(vx) => {
-                    // copy from V0 to Vx to memory starting at I.
-                    let i = self.registers.get_i();
-
-                    for reg in Register::iter_to(vx) {
-                        let value = self.registers.get_v(reg);
-                        let addr = i + (reg as u16);
-
-                        self.memory.set(addr, value);
-                    }
-
-                    self.registers.set_i(i + (vx as u16) + (1 as u16));
-                }
-
-                CopyToRegisters(vx) => {
-                    let i = self.registers.get_i();
-
-                    for reg in Register::iter_to(vx) {
-                        let value = self.memory.get(i + (reg as u16));
-
-                        self.registers.set_v(reg, value);
-                    }
-
-                    self.registers.set_i(i + (vx as u16) + (1 as u16));
-                }
-            };
-
-            false
+        false
     }
 }
 
@@ -498,7 +502,6 @@ where
 
     fn execute_cycles(&mut self, cycles: usize) {
         for _ in 0..cycles {
-
             self.decrement_timers();
 
             if self.is_waiting() || self.is_paused() {

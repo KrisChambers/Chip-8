@@ -9,5 +9,5 @@ pub enum VMState {
     LoadingROM,
     Executing(Instruction),
     Paused,
-    WaitingForKey(Option<Nibble>)
+    WaitingForKey(Option<Nibble>),
 }

@@ -3,9 +3,9 @@ use std::io;
 //use std::env;
 
 /// Load the rom with the given name
-/// 
+///
 ///### Arguments
-/// 
+///
 ///- **name** : The name of the rom.
 ///
 pub fn load_rom(name: String) -> Result<Vec<u8>, io::Error> {

@@ -27,8 +27,9 @@ impl Chip8Keyboard for Keyboard {
     fn is_pressed(&self, key: Nibble) -> bool {
         if let Some(n) = self.pressed {
             n == key
+        } else {
+            false
         }
-        else { false }
     }
 
     fn clear(&mut self) {

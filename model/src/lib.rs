@@ -35,7 +35,7 @@ pub trait Chip8VirtualMachine {
     /// Set the key to pressed.
     ///
     ///### Arguments
-    /// 
+    ///
     ///- **key** : A nibble representing the key being pressed.
     ///
     fn press_key(&mut self, key: usize);

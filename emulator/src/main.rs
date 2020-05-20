@@ -3,12 +3,7 @@
 use sdl2::render::WindowCanvas;
 
 extern crate sdl2;
-use sdl2::{
-    pixels::Color,
-    event::Event,
-    keyboard::Keycode,
-    rect::Rect,
-};
+use sdl2::{event::Event, keyboard::Keycode, pixels::Color, rect::Rect};
 
 extern crate cpu;
 extern crate framebuffer;
@@ -52,7 +47,8 @@ fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("chip - 8", 640, 320)
+    let window = video_subsystem
+        .window("chip - 8", 640, 320)
         .position_centered()
         .build()
         .unwrap();
@@ -62,7 +58,7 @@ fn main() {
     // Background color
     canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 15, 15));
     canvas.clear();
-    canvas.present();   // Kind of like flushing the buffer?
+    canvas.present(); // Kind of like flushing the buffer?
 
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut vm = get_vm();
@@ -74,17 +70,21 @@ fn main() {
 
         for event in event_pump.poll_iter() {
             match event {
-                Event::Quit {..} |
-                Event::KeyDown { keycode: Some(Keycode::Escape), ..} => {
-                    break 'running
-                },
-                Event::KeyDown { keycode: Some(keycode), ..} => {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'running,
+                Event::KeyDown {
+                    keycode: Some(keycode),
+                    ..
+                } => {
                     process_keycode(keycode, &mut vm);
-                },
-                Event::KeyUp {..} => {
+                }
+                Event::KeyUp { .. } => {
                     vm.keyboard.clear();
                 }
-                _ => { }
+                _ => {}
             }
 
             if cycles > 0 {
@@ -95,67 +95,80 @@ fn main() {
 
         //println!("{}", vm.delay_timer);
 
-        if cycles > 0 { vm.execute_cycles(cycles)}
+        if cycles > 0 {
+            vm.execute_cycles(cycles)
+        }
         // vm.execute_cycles(cycles_per_frame);
 
         // This can happen on the main thread.
         draw_vm(&mut canvas, vm.get_framebuffer());
 
-        std::thread::sleep(std::time::Duration::new(0, 1_000_000_000u32 / (frames_per_second as u32)));
+        std::thread::sleep(std::time::Duration::new(
+            0,
+            1_000_000_000u32 / (frames_per_second as u32),
+        ));
     }
 }
 
+/// Calls press_key on the vm for the Chip-8 key corresponding
+/// to a SDL Keycode.
+///
+///### Arguments
+///
+///- **keycode**    : The SDL Keycode that is pressed.
+///- **vm**         : The Chip8VirtualMachine
+///
 fn process_keycode(keycode: Keycode, vm: &mut VM) {
     match keycode {
         Keycode::Num1 => {
             vm.press_key(0x1);
-        },
+        }
         Keycode::Num2 => {
             vm.press_key(0x2);
-        },
+        }
         Keycode::Num3 => {
             vm.press_key(0x3);
-        },
+        }
         Keycode::Num4 => {
             vm.press_key(0xC);
-        },
+        }
         Keycode::Q => {
             vm.press_key(0x4);
-        },
+        }
         Keycode::W => {
             vm.press_key(0x5);
-        },
+        }
         Keycode::E => {
             vm.press_key(0x6);
-        },
+        }
         Keycode::R => {
             vm.press_key(0xD);
-        },
+        }
         Keycode::A => {
             vm.press_key(0x7);
-        },
+        }
         Keycode::S => {
             vm.press_key(0x8);
-        },
+        }
         Keycode::D => {
             vm.press_key(0x9);
-        },
+        }
         Keycode::F => {
             vm.press_key(0xE);
-        },
+        }
         Keycode::Z => {
             vm.press_key(0xA);
-        },
+        }
         Keycode::X => {
             vm.press_key(0x0);
-        },
+        }
         Keycode::C => {
             vm.press_key(0xB);
         }
         Keycode::V => {
             vm.press_key(0xF);
-        },
-        _ => { }
+        }
+        _ => {}
     }
 }
 
@@ -175,7 +188,6 @@ static FOREGROUND_COLOR: Color = Color::RGB(128, 0, 128);
 ///- **buffer** : The FrameBuffer to be written.
 ///
 fn draw_vm(canvas: &mut WindowCanvas, buffer: &dyn Chip8FrameBuffer) {
-
     // This handles drawing the background.
     canvas.set_draw_color(BACKGROUND_COLOR);
     canvas.clear();
