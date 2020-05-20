@@ -38,7 +38,7 @@ pub trait Chip8VirtualMachine {
     /// 
     ///- **key** : A nibble representing the key being pressed.
     ///
-    fn press_key(&mut self, key: Nibble);
+    fn press_key(&mut self, key: usize);
 
     /// Releases pressed keys.
     ///
