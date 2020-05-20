@@ -4,7 +4,7 @@ use sdl2::render::WindowCanvas;
 
 extern crate sdl2;
 use sdl2::{
-    pixels::{PixelFormat, Color},
+    pixels::Color,
     event::Event,
     keyboard::Keycode,
     rect::Rect,
@@ -108,52 +108,52 @@ fn main() {
 fn process_keycode(keycode: Keycode, vm: &mut VM) {
     match keycode {
         Keycode::Num1 => {
-            vm.press_key(0x1.into());
+            vm.press_key(0x1);
         },
         Keycode::Num2 => {
-            vm.press_key(0x2.into());
+            vm.press_key(0x2);
         },
         Keycode::Num3 => {
-            vm.press_key(0x3.into());
+            vm.press_key(0x3);
         },
         Keycode::Num4 => {
-            vm.press_key(0xC.into());
+            vm.press_key(0xC);
         },
         Keycode::Q => {
-            vm.press_key(0x4.into());
+            vm.press_key(0x4);
         },
         Keycode::W => {
-            vm.press_key(0x5.into());
+            vm.press_key(0x5);
         },
         Keycode::E => {
-            vm.press_key(0x6.into());
+            vm.press_key(0x6);
         },
         Keycode::R => {
-            vm.press_key(0xD.into());
+            vm.press_key(0xD);
         },
         Keycode::A => {
-            vm.press_key(0x7.into());
+            vm.press_key(0x7);
         },
         Keycode::S => {
-            vm.press_key(0x8.into());
+            vm.press_key(0x8);
         },
         Keycode::D => {
-            vm.press_key(0x9.into());
+            vm.press_key(0x9);
         },
         Keycode::F => {
-            vm.press_key(0xE.into());
+            vm.press_key(0xE);
         },
         Keycode::Z => {
-            vm.press_key(0xA.into());
+            vm.press_key(0xA);
         },
         Keycode::X => {
-            vm.press_key(0x0.into());
+            vm.press_key(0x0);
         },
         Keycode::C => {
-            vm.press_key(0xB.into());
+            vm.press_key(0xB);
         }
         Keycode::V => {
-            vm.press_key(0xF.into());
+            vm.press_key(0xF);
         },
         _ => { }
     }
