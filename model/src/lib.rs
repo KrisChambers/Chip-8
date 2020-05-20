@@ -119,6 +119,10 @@ pub trait Chip8FrameBuffer: std::ops::Deref<Target = [u64]> + std::fmt::Debug {
     ///- **y**      : The y coordinate for where to start drawing.
     ///- **sprite** : A slice containing the sprite data.
     ///
+    ///### Returns
+    /// 
+    /// A boolean flag indicating if there was a collision.
+    /// 
     fn draw(&mut self, x: Byte, y: Byte, sprite: &[Byte]) -> bool;
 
     /// Clears the buffer.
