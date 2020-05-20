@@ -36,9 +36,9 @@ pub trait Chip8VirtualMachine {
     ///
     ///### Arguments
     ///
-    ///- **key** : A nibble representing the key being pressed.
+    ///- **key** : The key to press. Converts to a number between 0 and 15.
     ///
-    fn press_key(&mut self, key: usize);
+    fn press_key(&mut self, key: u8);
 
     /// Releases pressed keys.
     ///

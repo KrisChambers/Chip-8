@@ -492,8 +492,8 @@ where
         self.state = VMState::Initializing;
     }
 
-    fn press_key(&mut self, key: Nibble) {
-        self.keyboard.press(key);
+    fn press_key(&mut self, key: u8) {
+        self.keyboard.press(Nibble::from(key));
     }
 
     fn execute(&mut self) {
