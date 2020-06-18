@@ -60,23 +60,24 @@ impl Register {
     /// Gets the register from a byte address.
     ///
     pub fn new(byte: u8) -> Result<Self, String> {
+        use Register::*;
         match byte {
-            0x0 => Ok(Register::V0),
-            0x1 => Ok(Register::V1),
-            0x2 => Ok(Register::V2),
-            0x3 => Ok(Register::V3),
-            0x4 => Ok(Register::V4),
-            0x5 => Ok(Register::V5),
-            0x6 => Ok(Register::V6),
-            0x7 => Ok(Register::V7),
-            0x8 => Ok(Register::V8),
-            0x9 => Ok(Register::V9),
-            0xA => Ok(Register::VA),
-            0xB => Ok(Register::VB),
-            0xC => Ok(Register::VC),
-            0xD => Ok(Register::VD),
-            0xE => Ok(Register::VE),
-            0xF => Ok(Register::VF),
+            0x0 => Ok(V0),
+            0x1 => Ok(V1),
+            0x2 => Ok(V2),
+            0x3 => Ok(V3),
+            0x4 => Ok(V4),
+            0x5 => Ok(V5),
+            0x6 => Ok(V6),
+            0x7 => Ok(V7),
+            0x8 => Ok(V8),
+            0x9 => Ok(V9),
+            0xA => Ok(VA),
+            0xB => Ok(VB),
+            0xC => Ok(VC),
+            0xD => Ok(VD),
+            0xE => Ok(VE),
+            0xF => Ok(VF),
             _ => Err(String::from("Invalid register")),
         }
     }

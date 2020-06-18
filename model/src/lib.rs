@@ -1,9 +1,11 @@
+//! This crate contains traits that represent the pieces of a chip-8 machine.
+
 extern crate data;
 mod register;
 
 pub use register::*;
 
-use data::{Address, Byte, Nibble};
+use data::{ Address, Byte, Nibble };
 
 /// Trait describing the main functionality of a VirtualMachine.
 ///
