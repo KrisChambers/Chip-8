@@ -7,6 +7,10 @@ pub use register::*;
 
 use data::{ Address, Byte, Nibble };
 
+pub trait Rom {
+
+}
+
 /// Trait describing the main functionality of a VirtualMachine.
 ///
 pub trait Chip8VirtualMachine {
@@ -28,7 +32,7 @@ pub trait Chip8VirtualMachine {
     ///
     ///- **data** : The bytes of the rom file.
     ///
-    fn load_rom(&mut self, data: Vec<u8>);
+    fn load_rom(&mut self, data: &[u8]);
 
     /// Returns the FrameBuffer.
     ///

@@ -93,12 +93,10 @@ fn main() {
             }
         }
 
-        //println!("{}", vm.delay_timer);
 
         if cycles > 0 {
             vm.execute_cycles(cycles)
         }
-        // vm.execute_cycles(cycles_per_frame);
 
         // This can happen on the main thread.
         draw_vm(&mut canvas, vm.get_framebuffer());
