@@ -206,3 +206,15 @@ pub trait Chip8Keyboard {
     ///
     fn clear(&mut self);
 }
+
+pub trait Compute {
+    fn compute(
+        pc: &mut dyn Chip8ProgramCounter,
+        registers: &mut dyn Chip8RegisterBank,
+        framebuffer: &mut dyn Chip8FrameBuffer,
+        memory: &mut dyn Chip8Memory,
+        delay_timer: &mut Box<u8>,
+        sound_timer: &mut Box<u8>
+
+    ) -> Result<(), String>;
+}

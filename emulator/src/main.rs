@@ -63,7 +63,7 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut vm = get_vm();
     let rom = load_rom("tetris".into()).unwrap();
-    vm.load_rom(rom);
+    vm.load_rom(&rom);
 
     'running: loop {
         let mut cycles = cycles_per_frame;

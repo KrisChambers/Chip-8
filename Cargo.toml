@@ -11,5 +11,5 @@ members = [
     "cpu",
     "instruction",
     "keyboard",
-    "rom_library"
+    "rom_library",
 ]

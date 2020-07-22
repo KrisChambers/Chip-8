@@ -477,7 +477,7 @@ where
         &self.framebuffer
     }
 
-    fn load_rom(&mut self, data: Vec<u8>) {
+    fn load_rom(&mut self, data: &[u8]) {
         self.state = VMState::LoadingROM;
 
         let start_addr = self.pc.current();
