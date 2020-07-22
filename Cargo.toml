@@ -8,7 +8,7 @@ members = [
     "register_bank",
     "memory",
     "program_counter",
-    "cpu",
+    "vm",
     "instruction",
     "keyboard",
     "rom_library",
